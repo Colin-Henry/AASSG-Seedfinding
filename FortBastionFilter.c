@@ -12,16 +12,11 @@ typedef struct {
     Pos first, second;
 } DoublePos;
 
-typedef struct ListNode {
-    Pos position;
-    struct ListNode* next;
-} ListNode;
-
 typedef struct {
     DoublePos regionCoords;
     int dimension;
-    ListNode* candidatesHead;
-    ListNode* positionsHead;
+    Pos candidates[10]; // Replace MAX_CANDIDATES with the maximum number of candidates you expect
+    Pos positions[10];   // Replace MAX_POSITIONS with the maximum number of positions you expect
     int candidatesCount;
     int positionsCount;
 } StructData;
@@ -32,25 +27,11 @@ const char* FILEPATH = "seeds.txt";
 int STRUCTS[] = {Bastion, Fortress};
 const int MC = MC_1_16_1;
 const uint64_t START_STRUCTURE_SEED = 0;
-const uint64_t STRUCTURE_SEEDS_TO_CHECK = 6252; //Program dies between 6252 and 6253
+const uint64_t STRUCTURE_SEEDS_TO_CHECK = 12000; //Program dies between 6252 and 6253
 const int UPPER_BITS_TO_CHECK = 1;
 int structureIndex = 0;
 
 int structureChecker(int lower48, int STRUCTS[], int structureIndex, int MC, DoublePos origCoords, StructData data[], int dataSize, int result, Pos* bastionCoordinates);
-
-void addCandidate(ListNode** head, Pos p) {
-    ListNode* newNode = (ListNode*)malloc(sizeof(ListNode));
-    newNode->position = p;
-    newNode->next = *head;
-    *head = newNode;
-}
-
-void addPosition(ListNode** head, Pos p) {
-    ListNode* newNode = (ListNode*)malloc(sizeof(ListNode));
-    newNode->position = p;
-    newNode->next = *head;
-    *head = newNode;
-}
 
 int structureChecker(int lower48, int STRUCTS[], int structureIndex, int MC, DoublePos origCoords, StructData data[], int dataSize, int result, Pos* bastionCoordinates) {
     Pos p;
@@ -66,8 +47,8 @@ int structureChecker(int lower48, int STRUCTS[], int structureIndex, int MC, Dou
                 (regZ == data[i].regionCoords.first.z && p.z < origCoords.first.z) ||
                 (regZ == data[i].regionCoords.second.z && p.z > origCoords.second.z)) continue;
 
-            addCandidate(&data[i].candidatesHead, p);
-            ++data[i].candidatesCount;
+            data[i].candidates[data[i].candidatesCount] = p;
+            data[i].candidatesCount++;
         }
     }
 
@@ -75,8 +56,8 @@ int structureChecker(int lower48, int STRUCTS[], int structureIndex, int MC, Dou
         result = 1;
     } else if (structureIndex == 0) {
         result = 2;
-        bastionCoordinates->x = data[i].candidatesHead->position.x;
-        bastionCoordinates->z = data[i].candidatesHead->position.z;
+        bastionCoordinates->x = data[i].candidates[0].x;
+        bastionCoordinates->z = data[i].candidates[0].z;
     } else {
         result = 2;
     }
@@ -87,11 +68,9 @@ int main() {
     const int numberOfStructs = sizeof(STRUCTS) / sizeof(*STRUCTS);
     StructData data[numberOfStructs];
 
-    struct Node* head = NULL;
-
     int i = 0;
-    data[i].candidatesHead = NULL;
-    data[i].positionsHead = NULL;
+    data[i].candidatesCount = 0;
+    data[i].positionsCount = 0;
 
     Pos bastionCoordinates;
     Pos fortressCoordinates;
@@ -142,14 +121,14 @@ int main() {
     for (uint64_t lower48 = START_STRUCTURE_SEED; lower48 < STRUCTURE_SEEDS_TO_CHECK; ++lower48) {
         DoublePos bastionCoords = {{-96, -96}, {96, 96}};
         int structureIndex = 0;
-        result = structureChecker(lower48, STRUCTS, 0, MC, bastionCoords, data, numberOfStructs, result, &bastionCoordinates);        
+        result = structureChecker(lower48, STRUCTS, 0, MC, bastionCoords, data, numberOfStructs, result, &bastionCoordinates);
         if (result == 1) {
             continue;
             // Didn't find a candidate and continuing to the next structure seed
         } else {
             DoublePos fortressCoords = {{-96 + bastionCoordinates.x, -96 + bastionCoordinates.z}, {96 + bastionCoordinates.x, 96 + bastionCoordinates.z}};
             int structureIndex = 1;
-            result = structureChecker(lower48, STRUCTS, 1, MC, fortressCoords, data, numberOfStructs, result, &fortressCoordinates);        
+            result = structureChecker(lower48, STRUCTS, 1, MC, fortressCoords, data, numberOfStructs, result, &fortressCoordinates);
             if (result == 1) {
                 continue;
                 // Didn't find a candidate and continuing to the next structure seed
@@ -159,14 +138,12 @@ int main() {
                     for (int i = 0; i < numberOfStructs; ++i) {
                         data[i].positionsCount = 0;
                         if (g.seed != seed || g.dim != data[i].dimension) applySeed(&g, data[i].dimension, seed);
-                        ListNode* candidateNode = data[i].candidatesHead;
-                        while (candidateNode != NULL) {
-                            if (!isViableStructurePos(STRUCTS[i], &g, candidateNode->position.x, candidateNode->position.z, 0) ||
-                                !isViableStructureTerrain(STRUCTS[i], &g, candidateNode->position.x, candidateNode->position.z))
+                        for (int j = 0; j < data[i].candidatesCount; ++j) {
+                            if (!isViableStructurePos(STRUCTS[i], &g, data[i].candidates[j].x, data[i].candidates[j].z, 0) ||
+                                !isViableStructureTerrain(STRUCTS[i], &g, data[i].candidates[j].x, data[i].candidates[j].z))
                                 continue;
-                            addPosition(&data[i].positionsHead, candidateNode->position);
-                            ++data[i].positionsCount;
-                            candidateNode = candidateNode->next;
+                            data[i].positions[data[i].positionsCount] = data[i].candidates[j];
+                            data[i].positionsCount++;
                         }
                         if (!data[i].positionsCount) continue;
                     }
@@ -179,49 +156,17 @@ int main() {
                 }
             }
         }
-        nextStructureSeed:
-
+    nextStructureSeed:
+        // Clean up positions for next iteration
         for (int i = 0; i < numberOfStructs; ++i) {
-            ListNode* candidateNode = data[i].candidatesHead;
-            while (candidateNode != NULL) {
-                ListNode* temp = candidateNode;
-                candidateNode = candidateNode->next;
-                free(temp);
-            }
-            data[i].candidatesHead = NULL;
-
-            ListNode* positionNode = data[i].positionsHead;
-            while (positionNode != NULL) {
-                ListNode* temp = positionNode;
-                positionNode = positionNode->next;
-                free(temp);
-            }
-            data[i].positionsHead = NULL;
+            data[i].candidatesCount = 0;
+            data[i].positionsCount = 0;
         }
-
         continue;
     }
 
     fprintf(fp, "Done\n");
     fclose(fp);
-
-    for (int i = 0; i < numberOfStructs; ++i) {
-        ListNode* candidateNode = data[i].candidatesHead;
-        while (candidateNode != NULL) {
-            ListNode* temp = candidateNode;
-            candidateNode = candidateNode->next;
-            free(temp);
-        }
-        data[i].candidatesHead = NULL;
-
-        ListNode* positionNode = data[i].positionsHead;
-        while (positionNode != NULL) {
-            ListNode* temp = positionNode;
-            positionNode = positionNode->next;
-            free(temp);
-        }
-        data[i].positionsHead = NULL;
-    }
 
     return 0;
 }
