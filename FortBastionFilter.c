@@ -15,8 +15,8 @@ typedef struct {
 typedef struct {
     DoublePos regionCoords;
     int dimension;
-    Pos candidates[10]; // Replace MAX_CANDIDATES with the maximum number of candidates you expect
-    Pos positions[10];   // Replace MAX_POSITIONS with the maximum number of positions you expect
+    Pos candidates[8]; // Replace MAX_CANDIDATES with the maximum number of candidates you expect
+    Pos positions[8];   // Replace MAX_POSITIONS with the maximum number of positions you expect
     int candidatesCount;
     int positionsCount;
 } StructData;
@@ -27,7 +27,7 @@ const char* FILEPATH = "seeds.txt";
 int STRUCTS[] = {Bastion, Fortress};
 const int MC = MC_1_16_1;
 const uint64_t START_STRUCTURE_SEED = 0;
-const uint64_t STRUCTURE_SEEDS_TO_CHECK = 12000; //Program dies between 6252 and 6253
+const uint64_t STRUCTURE_SEEDS_TO_CHECK = 4294967296; //2^16 = 65536, 2^32 = 4294967296, 2^48 = 281474976710656
 const int UPPER_BITS_TO_CHECK = 1;
 int structureIndex = 0;
 
