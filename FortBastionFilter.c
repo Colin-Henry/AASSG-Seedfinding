@@ -32,7 +32,7 @@ const char* FILEPATH = "seeds.txt";
 int STRUCTS[] = {Bastion, Fortress};
 const int MC = MC_1_16_1;
 const uint64_t START_STRUCTURE_SEED = 0;
-const uint64_t STRUCTURE_SEEDS_TO_CHECK = 5000;
+const uint64_t STRUCTURE_SEEDS_TO_CHECK = 6252; //Program dies between 6252 and 6253
 const int UPPER_BITS_TO_CHECK = 1;
 int structureIndex = 0;
 
@@ -180,13 +180,31 @@ int main() {
             }
         }
         nextStructureSeed:
+
+        for (int i = 0; i < numberOfStructs; ++i) {
+            ListNode* candidateNode = data[i].candidatesHead;
+            while (candidateNode != NULL) {
+                ListNode* temp = candidateNode;
+                candidateNode = candidateNode->next;
+                free(temp);
+            }
+            data[i].candidatesHead = NULL;
+
+            ListNode* positionNode = data[i].positionsHead;
+            while (positionNode != NULL) {
+                ListNode* temp = positionNode;
+                positionNode = positionNode->next;
+                free(temp);
+            }
+            data[i].positionsHead = NULL;
+        }
+
         continue;
     }
 
     fprintf(fp, "Done\n");
     fclose(fp);
 
-    // Free dynamically allocated memory
     for (int i = 0; i < numberOfStructs; ++i) {
         ListNode* candidateNode = data[i].candidatesHead;
         while (candidateNode != NULL) {
@@ -194,6 +212,7 @@ int main() {
             candidateNode = candidateNode->next;
             free(temp);
         }
+        data[i].candidatesHead = NULL;
 
         ListNode* positionNode = data[i].positionsHead;
         while (positionNode != NULL) {
@@ -201,6 +220,7 @@ int main() {
             positionNode = positionNode->next;
             free(temp);
         }
+        data[i].positionsHead = NULL;
     }
 
     return 0;
