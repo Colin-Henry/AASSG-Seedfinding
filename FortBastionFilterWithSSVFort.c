@@ -23,10 +23,7 @@ typedef struct
     int positionsCount;
 } StructData;
 
-const int r = 0;
 DoublePos origCoords = {{-96, -96}, {96, 96}};
-const char* FILEPATH = "seeds.txt";
-const char* FILEPATH2 = "seeds2.txt";
 int STRUCTS[] = {Bastion, Fortress};
 const int MC = MC_1_16_1;
 const uint64_t START_STRUCTURE_SEED = 0;
@@ -133,16 +130,12 @@ int main()
                                                                                 DIM_OVERWORLD;
     }
 
-    FILE* fp = fopen(FILEPATH, "a");
-    if (!fp) exit(1);
-    FILE* fp2 = fopen(FILEPATH2, "a");
-    if (!fp2) exit(1);
-
     Generator g;
     setupGenerator(&g, MC, 0);
 
     int biome = 0;
     int result = 0;
+    uint64_t seed;
 
     for (uint64_t lower48 = START_STRUCTURE_SEED; lower48 < STRUCTURE_SEEDS_TO_CHECK; ++lower48) 
     {
@@ -170,7 +163,7 @@ int main()
                     int allChecksFailed = 1;
                     for (uint64_t upper16 = 0; upper16 < UPPER_BITS_TO_CHECK; ++upper16) 
                     {
-                        uint64_t seed = lower48 | (upper16 << 48);
+                        seed = lower48 | (upper16 << 48);
                         for (int i = 0; i < numberOfStructs; ++i) 
                         {
                             data[i].positionsCount = 0;
@@ -201,14 +194,14 @@ int main()
                     {
                         goto nextStructureSeed;
                     }
-                    fprintf(fp, "%" PRId64 "\n", seed);
+                    printf("A%" PRId64 "\n", seed);
 
                     biome = getBiomeAt(&g, 1, fortCoordinates[bastionIdx].x, 64, fortCoordinates[bastionIdx].z); 
                     if (biome != soul_sand_valley) 
                     {    
                         goto nextStructureSeed;
                     }
-                    fprintf(fp2, "%" PRId64 "\n", seed);
+                    printf("B%" PRId64 "\n", seed);
                     goto nextStructureSeed;
                 }
             }
@@ -223,11 +216,6 @@ int main()
         }
         continue;
     }
-
-    fprintf(fp, "Done\n");
-    fclose(fp);
-    fprintf(fp2, "Done\n");
-    fclose(fp2);
 
     return 0;
 }
