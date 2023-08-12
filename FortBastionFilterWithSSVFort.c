@@ -81,8 +81,41 @@ int structureChecker(int lower48, int STRUCTS[], int structureIndex, int MC, Dou
     return result;
 }
 
-int main() 
+int main(int argc, char **argv) 
 {
+    FILE *fp;
+    char *inputPath = "seedRange.txt";
+
+    for (int i = 1; i < argc; i++) 
+    {
+        if (strcmp(argv[i], "--input") == 0) 
+        {
+            inputPath = argv[i + 1];
+        }
+    }
+
+    if (inputPath == NULL) 
+    {
+        printf("Error: --input argument is required.\n");
+        return 1;
+    }
+
+    fp = fopen(inputPath, "r");
+    if (fp == NULL) 
+    {
+        printf("Error: Unable to open input file.\n");
+        return 1;
+    }
+
+    uint64_t START_STRUCTURE_SEED, STRUCTURE_SEEDS_TO_CHECK;
+    if (fscanf(fp, "%" SCNu64 "%" SCNu64, &START_STRUCTURE_SEED, &STRUCTURE_SEEDS_TO_CHECK) != 2) 
+    {
+        printf("Error: Unable to read seeds from file.\n");
+        fclose(fp);
+        return 1;
+    }
+    fclose(fp);
+    
     const int numberOfStructs = sizeof(STRUCTS) / sizeof(*STRUCTS);
     StructData data[numberOfStructs];
 
@@ -216,6 +249,6 @@ int main()
         }
         continue;
     }
-
+    fclose(fp);
     return 0;
 }
