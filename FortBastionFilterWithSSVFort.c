@@ -26,8 +26,6 @@ typedef struct
 DoublePos origCoords = {{-96, -96}, {96, 96}};
 int STRUCTS[] = {Bastion, Fortress};
 const int MC = MC_1_16_1;
-const uint64_t START_STRUCTURE_SEED = 0;
-const uint64_t STRUCTURE_SEEDS_TO_CHECK = 65536; //2^16 = 65536, 2^32 = 4294967296, 2^48 = 281474976710656
 const int UPPER_BITS_TO_CHECK = 1;
 int structureIndex = 0;
 
