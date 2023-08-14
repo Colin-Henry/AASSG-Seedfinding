@@ -81,6 +81,13 @@ int structureChecker(int lower48, int STRUCTS[], int structureIndex, int MC, Dou
     return result;
 }
 
+void printBinary(uint64_t number, int bits) {
+    for (int i = bits - 1; i >= 0; i--) {
+        uint64_t mask = (uint64_t)1 << i;
+        putchar((number & mask) ? '1' : '0');
+    }
+}
+
 int main(int argc, char **argv) 
 {
     FILE *fp;
@@ -227,14 +234,19 @@ int main(int argc, char **argv)
                     {
                         goto nextStructureSeed;
                     }
-                    printf("A%" PRId64 "\n", seed);
+                    printf("A");
+                    printBinary(lower48, 48);
+                    printf("\n");
 
                     biome = getBiomeAt(&g, 1, fortCoordinates[bastionIdx].x, 64, fortCoordinates[bastionIdx].z); 
                     if (biome != soul_sand_valley) 
                     {    
                         goto nextStructureSeed;
                     }
-                    printf("B%" PRId64 "\n", seed);
+                    printf("B");
+                    printBinary(lower48, 48);
+                    printf("\n");
+
                     goto nextStructureSeed;
                 }
             }
