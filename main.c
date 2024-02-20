@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
     {
         findSSVFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource);
-        linkedGateway(currentStructureSeed);
+        //linkedGateway(currentStructureSeed);
     }
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
@@ -80,18 +80,16 @@ int main(int argc, char *argv[])
 // Est. structure seeds: 204,954,009,600 seeds (Based on 2^32 seedcount)
 // Est. 64-bit seeds: 13,431,866,000,000,000 seeds (Based on 2^32 seedcount)
 
-// NOTE: Occasionally prints a result twice. Once duplicate results are trimmed, results match cubiomesViewer (tested from 0-2^32)
+// Results match cubiomesViewer (tested from 0-2^32)
 
 // TODO:
 // Add thread protection for printing
 // Figure out why the cluster is only printing for 1 node
-// Remove duplicate entries
 // Sort data A-Z
 // Add end city detection to the end filter
 // Add ship detection to the end filter
 // Add print statements to the end filter
 // Add coordinate print statements to to the end filter
-// Link the end filter with the main program
 // Additional testing if needed
 // Optimization if needed
 // Update github accordingly

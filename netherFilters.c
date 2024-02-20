@@ -80,6 +80,7 @@ void findSSVFastions(uint64_t currentStructureSeed, Pos* bastions, int bastCount
             if (checkStructureReqs(biomeSource, &(bastions[bastID]), &(forts[fortID])))
             {
                 fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+                return;
             }
         }
     }

@@ -418,8 +418,6 @@ Pos3 linkedGateway(uint64_t lower48)
 	Pos maingateway = getMainGateway(lower48);
     DEBUG("MAIN GATEWAY   %d %d\n", maingateway.x, maingateway.z);
 
-    printf("passed main gateway\n");
-
     double rootlen = sqrt(maingateway.x * maingateway.x + maingateway.z * maingateway.z);
 
     Vec normalizedVector = {maingateway.x / rootlen, maingateway.z / rootlen};
