@@ -6,3 +6,6 @@ How to run:
 4. Run with mpiexec -n 3 ./a.out
    -> Replace 3 with how many cores you want to use]
 5. Results can be found in the folder "Output"
+
+
+If you'd like to change the range of seeds being tested, adjust the values in "seedRange.txt". The first value is your starting seed and the second value is your ending seed
