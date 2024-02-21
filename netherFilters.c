@@ -55,33 +55,33 @@ bool checkStructureReqs(const Generator* biomeSource, Pos* bast, Pos* fort)
 
     if ((getBiomeAt(biomeSource, 4, (bast->x >> 2) + 2, 2, (bast->z >> 2) + 2)) == basalt_deltas)
         return false; // check if bastion spawns
+    else return true;
+}
 
-    fprintf(fileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
-
+bool checkForSSV(Pos* fort, const Generator* biomeSource)
+{
     if (getBiomeAt(biomeSource, 4, (fort->x >> 2), 2, (fort->z >> 2)) == soul_sand_valley) return true; // Center
     if (getBiomeAt(biomeSource, 4, (fort->x >> 2) + 8, 2, (fort->z >> 2)) == soul_sand_valley) return true; // Right
     if (getBiomeAt(biomeSource, 4, (fort->x >> 2) - 8, 2, (fort->z >> 2)) == soul_sand_valley) return true; // Left
     if (getBiomeAt(biomeSource, 4, (fort->x >> 2), 2, (fort->z >> 2) + 8) == soul_sand_valley) return true; // Top
     if (getBiomeAt(biomeSource, 4, (fort->x >> 2), 2, (fort->z >> 2) - 8) == soul_sand_valley) return true; // Bottom
-    else return false; // none of them had ssv 
+    else return false; // none of them had ssv
 }
 
-void findSSVFastions(uint64_t currentStructureSeed, Pos* bastions, int bastCount, Pos* forts, int fortCount, const Generator* biomeSource)
+bool findFastions(uint64_t currentStructureSeed, Pos* bastions, int bastCount, Pos* forts, int fortCount, const Generator* biomeSource, int bastID, int fortID)
 {
     getNetherStructs(currentStructureSeed, bastions, &bastCount, forts, &fortCount);
     if (bastCount == 0 || fortCount == 0) // skip seeds that don't have a bastion or don't have a fort
-        return;
+        return false;
 
     // check the requirements for each bastion-fortress pair
-    for (int bastID = 0; bastID < bastCount; bastID++)
+    for (bastID = 0; bastID < bastCount; bastID++)
     {
-        for (int fortID = 0; fortID < fortCount; fortID++)
+        for (fortID = 0; fortID < fortCount; fortID++)
         {
             if (checkStructureReqs(biomeSource, &(bastions[bastID]), &(forts[fortID])))
-            {
-                fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
-                return;
-            }
+                return true;
         }
     }
+    return false;
 }

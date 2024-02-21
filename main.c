@@ -40,14 +40,24 @@ int main(int argc, char *argv[])
     Pos bastions[4], forts[4];
     int bastCount = 0;
     int fortCount = 0;
+    int bastID = 0; 
+    int fortID = 0;
 
     Generator biomeSource;
     setupGenerator(&biomeSource, MC_1_16_1, 0);
 
     for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
     {
-        findSSVFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource);
-        //linkedGateway(currentStructureSeed);
+        bool isFastion = findFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource, bastID, fortID);
+        if (isFastion)
+        {
+            fprintf(fileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+            bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
+            if (isSSV)
+            {
+                fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+            }
+        }
     }
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
@@ -86,6 +96,8 @@ int main(int argc, char *argv[])
 // Add thread protection for printing
 // Figure out why the cluster is only printing for 1 node
 // Sort data A-Z
+// Move ssv detection to another function
+// Create if statements after each seedsift requirement is passed
 // Add end city detection to the end filter
 // Add ship detection to the end filter
 // Add print statements to the end filter
@@ -93,3 +105,5 @@ int main(int argc, char *argv[])
 // Additional testing if needed
 // Optimization if needed
 // Update github accordingly
+
+// Check once for ssv. If it's ssv, create a flag saying so. Then, at all other print statements, add a check for that flag. If its an ssv seed, also print that seed to the accompanying ssv list

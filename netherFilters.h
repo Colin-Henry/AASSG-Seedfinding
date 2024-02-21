@@ -10,4 +10,5 @@ int getRegionPos(Pos* structurePos, uint64_t structureSeed, int rx, int rz);
 void getNetherStructs(uint64_t structureSeed, Pos bastions[], int* bastionCount, Pos forts[], int* fortCount);
 bool checkStructureDistances(Pos* bast, Pos* fort);
 bool checkStructureReqs(const Generator* biomeSource, Pos* bast, Pos* fort);
-void findSSVFastions(uint64_t currentStructureSeed, Pos* bastions, int bastCount, Pos* forts, int fortCount, const Generator* biomeSource);
+bool findFastions(uint64_t currentStructureSeed, Pos* bastions, int bastCount, Pos* forts, int fortCount, const Generator* biomeSource, int bastID, int fortID);
+bool checkForSSV(Pos* fort, const Generator* biomeSource);
