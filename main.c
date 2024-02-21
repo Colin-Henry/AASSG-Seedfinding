@@ -49,13 +49,43 @@ int main(int argc, char *argv[])
     for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
     {
         bool isFastion = findFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource, bastID, fortID);
+
         if (isFastion)
         {
             fprintf(fileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+
             bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
+
             if (isSSV)
-            {
                 fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+            else
+
+            bool isEndCity = findEndCities(); // Need to add in coord returns for coord printing
+
+            if (isEndCity)
+            {
+                fprintf(fileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
+                fprintf(fileManagement.fastionEndCitySeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+
+                if (isSSV)
+                {
+                    fprintf(fileManagement.ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(fileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                }
+                else
+                
+                bool isEndCityShip = checkForShip(); // Need to add in coord returns for coord printing
+                if (isEndCityShip)
+                {
+                    fprintf(fileManagement.fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(fileManagement.fastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+
+                    if (isSSV)
+                    {
+                        fprintf(fileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
+                        fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                    }
+                }
             }
         }
     }
