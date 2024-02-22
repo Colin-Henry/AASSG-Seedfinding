@@ -521,3 +521,30 @@ Pos3 linkedGateway(uint64_t lower48)
     DEBUG("----- GATEWAY   %d %d %d\n", gateway.x, gateway.y, gateway.z);
     return gateway;
 }
+
+bool findEndCities(uint64_t lower48)
+{
+    Pos3 gatewayCoords = linkedGateway(lower48);
+    Pos endCityCoords;
+    Pos endCityRegionCoords = {floor(gatewayCoords.x / (double)(16 * 20)), floor(gatewayCoords.z / (double)(16 * 20))};
+
+    if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, &endCityCoords)) // See if theres a generation attempt within the region
+        return false;
+    
+
+    int dX = abs(gatewayCoords.x - endCityCoords.x); // See if the end city is within 96 chebyshev distance from the gateway
+    int dZ = abs(gatewayCoords.z - endCityCoords.z);
+    if (dX > 96 || dZ > 96)
+        return false;
+
+    Generator endBiomeSource;
+    setupGenerator(&endBiomeSource, MC_1_16_1, 0);
+
+    applySeed(&endBiomeSource, DIM_END, lower48);
+    if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords.x, endCityCoords.z, 0)) // Checking the right biomes if it can generate
+        return false;
+    printf("%d %d %ld\n", endCityCoords.x, endCityCoords.z, lower48);
+    if (getSurfaceHeightEnd(MC_1_16_1, lower48, endCityCoords.x, endCityCoords.z) < 60) // Checking if it can generate (if y >= 60)
+        return false;
+    else return true;
+}

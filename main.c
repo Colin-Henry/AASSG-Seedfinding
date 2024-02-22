@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
 
             if (isSSV)
                 fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
-            else
-
-            bool isEndCity = findEndCities(); // Need to add in coord returns for coord printing
+            
+            
+            bool isEndCity = findEndCities(currentStructureSeed); // Need to add in coord returns for coord printing
 
             if (isEndCity)
             {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
                     fprintf(fileManagement.ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
                     fprintf(fileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
                 }
-                else
+                /*
                 
                 bool isEndCityShip = checkForShip(); // Need to add in coord returns for coord printing
                 if (isEndCityShip)
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
                         fprintf(fileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
                         fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
                     }
-                }
+                }*/
             }
         }
     }
