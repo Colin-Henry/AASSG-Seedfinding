@@ -53,7 +53,7 @@ bool checkStructureReqs(const Generator* biomeSource, Pos* bast, Pos* fort)
 
     applySeed((Generator *)biomeSource, DIM_NETHER, currentStructureSeed);
 
-    if ((getBiomeAt(biomeSource, 4, (bast->x >> 2) + 2, 2, (bast->z >> 2) + 2)) == basalt_deltas)
+    if ((getBiomeAt(biomeSource, 4, (bast->x >> 2) + 2, 0, (bast->z >> 2) + 2)) == basalt_deltas)
         return false; // check if bastion spawns
     else return true;
 }

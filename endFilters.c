@@ -468,7 +468,7 @@ Pos3 linkedGateway(uint64_t lower48)
     Pos chunkPos = {floor(gatewayVector.x / 16), floor(gatewayVector.z / 16)};
     bool chunkHasValidSpawn = chunkHasIslandBlocks(&chunkPos, &endBiomeGenerator, lower48) 
         || chunkHasTerrainBlocks(&chunkPos, &etn, true);
-
+    
     if (!chunkHasValidSpawn) 
     {
         // 75 will most likely be the highest block around, we can get a really good approximation of the position just
@@ -524,14 +524,13 @@ Pos3 linkedGateway(uint64_t lower48)
 
 bool findEndCities(uint64_t lower48)
 {
-    Pos3 gatewayCoords = linkedGateway(lower48);
+    Pos3 gatewayCoords = linkedGateway(lower48); // This whole function makes the program ~435x slower and I have no idea if there's gonna be a way to speed it up :(
     Pos endCityCoords;
     Pos endCityRegionCoords = {floor(gatewayCoords.x / (double)(16 * 20)), floor(gatewayCoords.z / (double)(16 * 20))};
 
     if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, &endCityCoords)) // See if theres a generation attempt within the region
         return false;
     
-
     int dX = abs(gatewayCoords.x - endCityCoords.x); // See if the end city is within 96 chebyshev distance from the gateway
     int dZ = abs(gatewayCoords.z - endCityCoords.z);
     if (dX > 96 || dZ > 96)
@@ -539,12 +538,14 @@ bool findEndCities(uint64_t lower48)
 
     Generator endBiomeSource;
     setupGenerator(&endBiomeSource, MC_1_16_1, 0);
+    SurfaceNoise endSurfaceNoise;
+    initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
 
     applySeed(&endBiomeSource, DIM_END, lower48);
-    if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords.x, endCityCoords.z, 0)) // Checking the right biomes if it can generate
+    if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords.x, endCityCoords.z, 0)) // Checking if it can generate due to biomes
         return false;
-    printf("%d %d %ld\n", endCityCoords.x, endCityCoords.z, lower48);
-    if (getSurfaceHeightEnd(MC_1_16_1, lower48, endCityCoords.x, endCityCoords.z) < 60) // Checking if it can generate (if y >= 60)
+
+    if (!isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, endCityCoords.x, endCityCoords.z))// Checking if it can generate (if y >= 60)
         return false;
     else return true;
 }
