@@ -527,7 +527,7 @@ bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
     *gatewayCoords = linkedGateway(lower48); // This whole function makes the program ~435x slower and I have no idea if there's gonna be a way to speed it up :(
     Pos endCityRegionCoords = {floor(gatewayCoords->x / (double)(16 * 20)), floor(gatewayCoords->z / (double)(16 * 20))};
 
-    if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, &endCityCoords)) // See if theres a generation attempt within the region
+    if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, endCityCoords)) // See if theres a generation attempt within the region
         return false;
     
     int dX = abs(gatewayCoords->x - endCityCoords->x); // See if the end city is within 96 chebyshev distance from the gateway
