@@ -83,8 +83,6 @@ int main(int argc, char *argv[])
                     {
                         fprintf(fileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
                         fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
-                        printf("%d %d %d\n", gatewayCoords.x, gatewayCoords.y, gatewayCoords.z);
-                        printf("%d %d\n", endCityCoords.x, endCityCoords.z);
                     }
                 }
             }
