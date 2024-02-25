@@ -522,10 +522,9 @@ Pos3 linkedGateway(uint64_t lower48)
     return gateway;
 }
 
-bool findEndCities(uint64_t lower48)
+bool findEndCities(uint64_t lower48, Pos endCityCoords, Pos3 gatewayCoords)
 {
-    Pos3 gatewayCoords = linkedGateway(lower48); // This whole function makes the program ~435x slower and I have no idea if there's gonna be a way to speed it up :(
-    Pos endCityCoords;
+    gatewayCoords = linkedGateway(lower48); // This whole function makes the program ~435x slower and I have no idea if there's gonna be a way to speed it up :(
     Pos endCityRegionCoords = {floor(gatewayCoords.x / (double)(16 * 20)), floor(gatewayCoords.z / (double)(16 * 20))};
 
     if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, &endCityCoords)) // See if theres a generation attempt within the region
@@ -548,4 +547,15 @@ bool findEndCities(uint64_t lower48)
     if (!isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, endCityCoords.x, endCityCoords.z))// Checking if it can generate (if y >= 60)
         return false;
     else return true;
+}
+
+bool checkForShip(uint64_t lower48, Pos endCityCoords)
+{
+    Piece endCityPieces[END_CITY_PIECES_MAX];
+    int numberOfPieces = getEndCityPieces((Piece *)endCityPieces, lower48, (endCityCoords.x >> 4), (endCityCoords.z >> 4));
+    for (int currentPiece = 0; currentPiece <= numberOfPieces; currentPiece++)
+        if (endCityPieces[currentPiece].type == END_SHIP)
+            return true;
+    
+    return false;
 }

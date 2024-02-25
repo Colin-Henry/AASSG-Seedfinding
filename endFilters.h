@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <string.h>
 #include "cubiomes.h"
 
 
@@ -116,4 +117,5 @@ Pos3 linkedGateway(uint64_t lower48);
 void sampleNoiseColumnEnd(double column[], const SurfaceNoise *sn, const EndNoise *en, int x, int z, int colymin, int colymax);
 int getSurfaceHeight(const double ncol00[], const double ncol01[], const double ncol10[], const double ncol11[], int colymin, int colymax, int blockspercell, double dx, double dz);
 
-bool findEndCities(uint64_t lower48);
+bool findEndCities(uint64_t lower48, Pos endCityCoords, Pos3 gatewayCoords);
+bool checkForShip(uint64_t lower48, Pos endCityCoords);

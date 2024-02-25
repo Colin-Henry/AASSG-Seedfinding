@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
     int fortCount = 0;
     int bastID = 0; 
     int fortID = 0;
+    Pos3 gatewayCoords = {0, 0, 0};
+    Pos endCityCoords = {0, 0};
 
     Generator biomeSource;
     setupGenerator(&biomeSource, MC_1_16_1, 0);
@@ -55,13 +57,11 @@ int main(int argc, char *argv[])
             fprintf(fileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
 
             bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
-
             if (isSSV)
                 fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
             
             
-            bool isEndCity = findEndCities(currentStructureSeed); // Need to add in coord returns for coord printing
-
+            bool isEndCity = findEndCities(currentStructureSeed, endCityCoords, gatewayCoords); // Need to add in coord returns for coord printing
             if (isEndCity)
             {
                 fprintf(fileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
@@ -72,9 +72,8 @@ int main(int argc, char *argv[])
                     fprintf(fileManagement.ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
                     fprintf(fileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
                 }
-                /*
                 
-                bool isEndCityShip = checkForShip(); // Need to add in coord returns for coord printing
+                bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords); // Need to add in coord returns for coord printing
                 if (isEndCityShip)
                 {
                     fprintf(fileManagement.fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
@@ -84,11 +83,15 @@ int main(int argc, char *argv[])
                     {
                         fprintf(fileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
                         fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                        printf("%d %d %d\n", gatewayCoords.x, gatewayCoords.y, gatewayCoords.z);
+                        printf("%d %d\n", endCityCoords.x, endCityCoords.z);
                     }
-                }*/
+                }
             }
         }
     }
+
+    
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
     
