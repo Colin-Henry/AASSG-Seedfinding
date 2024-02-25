@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
                 fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
             
             
-            bool isEndCity = findEndCities(currentStructureSeed, endCityCoords, gatewayCoords); // Need to add in coord returns for coord printing
+            bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords); // Need to add in coord returns for coord printing
             if (isEndCity)
             {
                 fprintf(fileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
