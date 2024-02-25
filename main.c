@@ -65,24 +65,24 @@ int main(int argc, char *argv[])
             if (isEndCity)
             {
                 fprintf(fileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
-                fprintf(fileManagement.fastionEndCitySeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                fprintf(fileManagement.fastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
 
                 if (isSSV)
                 {
                     fprintf(fileManagement.ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
-                    fprintf(fileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(fileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
                 }
                 
                 bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords); // Need to add in coord returns for coord printing
                 if (isEndCityShip)
                 {
                     fprintf(fileManagement.fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
-                    fprintf(fileManagement.fastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(fileManagement.fastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
 
                     if (isSSV)
                     {
                         fprintf(fileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
-                        fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 "\n", currentStructureSeed);
+                        fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
                     }
                 }
             }
@@ -121,17 +121,15 @@ int main(int argc, char *argv[])
 // Est. structure seeds: 204,954,009,600 seeds (Based on 2^32 seedcount)
 // Est. 64-bit seeds: 13,431,866,000,000,000 seeds (Based on 2^32 seedcount)
 
+// For SSV Fastion, End Ship City Seeds
+// Est. structure seeds: 352,321,536 seeds (Based on 21 results for 16777216 seeds)
+
 // Results match cubiomesViewer (tested from 0-2^32)
 
 // TODO:
 // Add thread protection for printing
 // Figure out why the cluster is only printing for 1 node
 // Sort data A-Z
-// Move ssv detection to another function
-// Create if statements after each seedsift requirement is passed
-// Add end city detection to the end filter
-// Add ship detection to the end filter
-// Add print statements to the end filter
 // Add coordinate print statements to to the end filter
 // Additional testing if needed
 // Optimization if needed
