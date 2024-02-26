@@ -6,33 +6,33 @@ void fileOpener(struct fileManagement *fileManagement)
 {
     fileManagement->seedRange = fopen("seedRange.txt", "r");
         if (fileManagement->seedRange == NULL) perror("Error opening seedRange.txt");
-    fileManagement->fastionSeeds = fopen("Output/fastionSeeds.txt", "a");
+    fileManagement->fastionSeeds = fopen("Output/fastionSeeds.txt", "w");
         if (fileManagement->fastionSeeds == NULL) perror("Error opening fastionSeeds.txt");
-    fileManagement->ssvFastionSeeds = fopen("Output/ssvFastionSeeds.txt", "a");
+    fileManagement->ssvFastionSeeds = fopen("Output/ssvFastionSeeds.txt", "w");
         if (fileManagement->ssvFastionSeeds == NULL) perror("Error opening ssvFastionSeeds.txt");
 
-    fileManagement->fastionEndCitySeeds = fopen("Output/fastionEndCitySeeds.txt", "a");
+    fileManagement->fastionEndCitySeeds = fopen("Output/fastionEndCitySeeds.txt", "w");
         if (fileManagement->fastionEndCitySeeds == NULL) perror("Error opening fastionEndCitySeeds.txt");
 
-    fileManagement->fastionEndCitySeedsWithCoords = fopen("Output/fastionEndCitySeedsWithCoords.txt", "a");
+    fileManagement->fastionEndCitySeedsWithCoords = fopen("Output/fastionEndCitySeedsWithCoords.txt", "w");
         if (fileManagement->fastionEndCitySeedsWithCoords == NULL) perror("Error opening fastionEndCitySeedsWithCoords.txt");
 
-    fileManagement->ssvFastionEndCitySeeds = fopen("Output/ssvFastionEndCitySeeds.txt", "a");
+    fileManagement->ssvFastionEndCitySeeds = fopen("Output/ssvFastionEndCitySeeds.txt", "w");
         if (fileManagement->ssvFastionEndCitySeeds == NULL) perror("Error opening ssvFastionEndCitySeeds.txt");
 
-    fileManagement->ssvFastionEndCitySeedsWithCoords = fopen("Output/ssvFastionEndCitySeedsWithCoords.txt", "a");
+    fileManagement->ssvFastionEndCitySeedsWithCoords = fopen("Output/ssvFastionEndCitySeedsWithCoords.txt", "w");
         if (fileManagement->ssvFastionEndCitySeedsWithCoords == NULL) perror("Error opening ssvFastionEndCitySeedsWithCoords.txt");
 
-    fileManagement->fastionEndCityShipSeeds = fopen("Output/fastionEndCityShipSeeds.txt", "a");
+    fileManagement->fastionEndCityShipSeeds = fopen("Output/fastionEndCityShipSeeds.txt", "w");
         if (fileManagement->fastionEndCityShipSeeds == NULL) perror("Error opening fastionEndCityShipSeeds.txt");
 
-    fileManagement->fastionEndCityShipSeedsWithCoords = fopen("Output/fastionEndCityShipSeedsWithCoords.txt", "a");
+    fileManagement->fastionEndCityShipSeedsWithCoords = fopen("Output/fastionEndCityShipSeedsWithCoords.txt", "w");
         if (fileManagement->fastionEndCityShipSeedsWithCoords == NULL) perror("Error opening fastionEndCityShipSeedsWithCoords.txt");
 
-    fileManagement->ssvFastionEndCityShipSeeds = fopen("Output/ssvFastionEndCityShipSeeds.txt", "a");
+    fileManagement->ssvFastionEndCityShipSeeds = fopen("Output/ssvFastionEndCityShipSeeds.txt", "w");
         if (fileManagement->ssvFastionEndCityShipSeeds == NULL) perror("Error opening ssvFastionEndCityShipSeeds.txt");
 
-    fileManagement->ssvFastionEndCityShipSeedsWithCoords = fopen("Output/ssvFastionEndCityShipSeedsWithCoords.txt", "a");
+    fileManagement->ssvFastionEndCityShipSeedsWithCoords = fopen("Output/ssvFastionEndCityShipSeedsWithCoords.txt", "w");
         if (fileManagement->ssvFastionEndCityShipSeedsWithCoords == NULL) perror("Error opening ssvFastionEndCityShipSeedsWithCoords.txt");
 }
 

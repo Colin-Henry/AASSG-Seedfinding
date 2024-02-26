@@ -26,69 +26,124 @@ int main(int argc, char *argv[])
     fileOpener(&fileManagement);
     readSeedRange(&fileManagement, &startingStructureSeed, &endingStructureSeed);
 
-    uint64_t totalIterations = endingStructureSeed - startingStructureSeed + 1;
-    uint64_t iterationsPerProcess = totalIterations / size;
-    uint64_t extraIterations = totalIterations % size;
-
-    uint64_t startIteration = rank * iterationsPerProcess + startingStructureSeed;
-    uint64_t endIteration = (rank + 1) * iterationsPerProcess - 1 + startingStructureSeed;
-    if (rank == size - 1) 
+    if (rank != 0) // Dedicating rank 0 as the "file writing process"
     {
-        endIteration += extraIterations; // Add extra iterations to the last process
-    }
+        uint64_t totalIterations = endingStructureSeed - startingStructureSeed + 1;
+        uint64_t iterationsPerProcess = totalIterations / (size - 1);
+        uint64_t extraIterations = totalIterations % (size - 1);
 
-    Pos bastions[4], forts[4];
-    int bastCount = 0;
-    int fortCount = 0;
-    int bastID = 0; 
-    int fortID = 0;
-    Pos3 gatewayCoords = {0, 0, 0};
-    Pos endCityCoords = {0, 0};
-
-    Generator biomeSource;
-    setupGenerator(&biomeSource, MC_1_16_1, 0);
-
-    for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
-    {
-        bool isFastion = findFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource, bastID, fortID);
-
-        if (isFastion)
+        uint64_t startIteration = (rank - 1) * iterationsPerProcess + startingStructureSeed;
+        uint64_t endIteration = rank * iterationsPerProcess - 1 + startingStructureSeed;
+        if (rank == size - 1) 
         {
-            fprintf(fileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+            endIteration += extraIterations; // Add extra iterations to the last process
+        }
 
-            bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
-            if (isSSV)
-                fprintf(fileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
-            
-            
-            bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords); // Need to add in coord returns for coord printing
-            if (isEndCity)
+        Pos bastions[4], forts[4];
+        int bastCount = 0;
+        int fortCount = 0;
+        int bastID = 0; 
+        int fortID = 0;
+        Pos3 gatewayCoords = {0, 0, 0};
+        Pos endCityCoords = {0, 0};
+
+        Generator biomeSource;
+        setupGenerator(&biomeSource, MC_1_16_1, 0);
+
+    
+        char fastionSeedsFilename[1000]; // Arbitrary size, but is big enough to fit all names and takes very little memory
+        snprintf(fastionSeedsFilename, sizeof(fastionSeedsFilename), "Output/Temp/fastionSeeds/fastionSeeds_temp_%d.txt", rank); // Generate unique filename for each process
+        FILE *fastionSeeds = fopen(fastionSeedsFilename, "w");
+
+        char ssvFastionSeedsFilename[1000];
+        snprintf(ssvFastionSeedsFilename, sizeof(ssvFastionSeedsFilename), "Output/Temp/ssvFastionSeeds/ssvFastionSeeds_temp_%d.txt", rank);
+        FILE *ssvFastionSeeds = fopen(ssvFastionSeedsFilename, "w");
+
+        char fastionEndCitySeedsFilename[1000];
+        snprintf(fastionEndCitySeedsFilename, sizeof(fastionEndCitySeedsFilename), "Output/Temp/fastionEndCitySeeds/fastionEndCitySeeds_temp_%d.txt", rank);
+        FILE *fastionEndCitySeeds = fopen(fastionEndCitySeedsFilename, "w");
+
+        char fastionEndCitySeedsWithCoordsFilename[1000];
+        snprintf(fastionEndCitySeedsWithCoordsFilename, sizeof(fastionEndCitySeedsWithCoordsFilename), "Output/Temp/fastionEndCitySeedsWithCoords/fastionEndCitySeedsWithCoords_temp_%d.txt", rank);
+        FILE *fastionEndCitySeedsWithCoords = fopen(fastionEndCitySeedsWithCoordsFilename, "w");
+
+        char ssvFastionEndCitySeedsFilename[1000];
+        snprintf(ssvFastionEndCitySeedsFilename, sizeof(ssvFastionEndCitySeedsFilename), "Output/Temp/ssvFastionEndCitySeeds/ssvFastionEndCitySeeds_temp_%d.txt", rank);
+        FILE *ssvFastionEndCitySeeds = fopen(ssvFastionEndCitySeedsFilename, "w");
+
+        char ssvFastionEndCitySeedsWithCoordsFilename[1000];
+        snprintf(ssvFastionEndCitySeedsWithCoordsFilename, sizeof(ssvFastionEndCitySeedsWithCoordsFilename), "Output/Temp/ssvFastionEndCitySeedsWithCoords/ssvFastionEndCitySeedsWithCoords_temp_%d.txt", rank);
+        FILE *ssvFastionEndCitySeedsWithCoords = fopen(ssvFastionEndCitySeedsWithCoordsFilename, "w");
+
+        char fastionEndCityShipSeedsFilename[1000];
+        snprintf(fastionEndCityShipSeedsFilename, sizeof(fastionEndCityShipSeedsFilename), "Output/Temp/fastionEndCityShipSeeds/fastionEndCityShipSeeds_temp_%d.txt", rank);
+        FILE *fastionEndCityShipSeeds = fopen(fastionEndCityShipSeedsFilename, "w");
+
+        char fastionEndCityShipSeedsWithCoordsFilename[1000];
+        snprintf(fastionEndCityShipSeedsWithCoordsFilename, sizeof(fastionEndCityShipSeedsWithCoordsFilename), "Output/Temp/fastionEndCityShipSeedsWithCoords/fastionEndCityShipSeedsWithCoords_temp_%d.txt", rank);
+        FILE *fastionEndCityShipSeedsWithCoords = fopen(fastionEndCityShipSeedsWithCoordsFilename, "w");
+
+        char ssvFastionEndCityShipSeedsFilename[1000];
+        snprintf(ssvFastionEndCityShipSeedsFilename, sizeof(ssvFastionEndCityShipSeedsFilename), "Output/Temp/ssvFastionEndCityShipSeeds/ssvFastionEndCityShipSeeds_temp_%d.txt", rank);
+        FILE *ssvFastionEndCityShipSeeds = fopen(ssvFastionEndCityShipSeedsFilename, "w");
+
+        char ssvFastionEndCityShipSeedsWithCoordsFilename[1000];
+        snprintf(ssvFastionEndCityShipSeedsWithCoordsFilename, sizeof(ssvFastionEndCityShipSeedsWithCoordsFilename), "Output/Temp/ssvFastionEndCityShipSeedsWithCoords/ssvFastionEndCityShipSeedsWithCoords_temp_%d.txt", rank);
+        FILE *ssvFastionEndCityShipSeedsWithCoords = fopen(ssvFastionEndCityShipSeedsWithCoordsFilename, "w");
+
+
+        for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
+        {
+            bool isFastion = findFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource, bastID, fortID);
+
+            if (isFastion)
             {
-                fprintf(fileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
-                fprintf(fileManagement.fastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                fprintf(fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
 
+                bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
                 if (isSSV)
-                {
-                    fprintf(fileManagement.ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
-                    fprintf(fileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
-                }
+                    fprintf(ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords); // Need to add in coord returns for coord printing
-                if (isEndCityShip)
+                
+                bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords); // Need to add in coord returns for coord printing
+                if (isEndCity)
                 {
-                    fprintf(fileManagement.fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
-                    fprintf(fileManagement.fastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                    fprintf(fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(fastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
 
                     if (isSSV)
                     {
-                        fprintf(fileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
-                        fprintf(fileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                        fprintf(ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
+                        fprintf(ssvFastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                    }
+                    
+                    bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords); // Need to add in coord returns for coord printing
+                    if (isEndCityShip)
+                    {
+                        fprintf(fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
+                        fprintf(fastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+
+                        if (isSSV)
+                        {
+                            fprintf(ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
+                            fprintf(ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                        }
                     }
                 }
             }
         }
-    }
 
+        fclose(fastionSeeds);
+        fclose(ssvFastionSeeds);
+        fclose(fastionEndCitySeeds);
+        fclose(fastionEndCitySeedsWithCoords);
+        fclose(ssvFastionEndCitySeeds);
+        fclose(ssvFastionEndCitySeedsWithCoords);
+        fclose(fastionEndCityShipSeeds);
+        fclose(fastionEndCityShipSeedsWithCoords);
+        fclose(ssvFastionEndCityShipSeeds);
+        fclose(ssvFastionEndCityShipSeedsWithCoords);
+    }
     
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
@@ -124,15 +179,12 @@ int main(int argc, char *argv[])
 // For SSV Fastion, End Ship City Seeds
 // Est. structure seeds: 352,321,536 seeds (Based on 21 results for 16777216 seeds)
 
-// Results match cubiomesViewer (tested from 0-2^32)
+// Fastion results match cubiomesViewer (tested from 0-2^32)
 
 // TODO:
 // Add thread protection for printing
 // Figure out why the cluster is only printing for 1 node
 // Sort data A-Z
-// Add coordinate print statements to to the end filter
 // Additional testing if needed
 // Optimization if needed
 // Update github accordingly
-
-// Check once for ssv. If it's ssv, create a flag saying so. Then, at all other print statements, add a check for that flag. If its an ssv seed, also print that seed to the accompanying ssv list
