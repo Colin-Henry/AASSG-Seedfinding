@@ -493,7 +493,7 @@ Pos3 linkedGateway(uint64_t lower48)
     Pos3 center = {cx*16 + 15, 0, cz*16 + 15};
 
     // calculate maximum surface height around center
-    Pos3 surfaceMax = getTerrainTallestBlock(&center, &etn);
+    Pos3 surfaceMax = getTerrainTallestBlock(&center, &etn); // This takes ~50% of the runtime (this was written when runtime was ~11 secs)
 
     // calculate maximum small end island height around center
     Pos3 islandMax = getIslandTallestBlock(&endBiomeGenerator, lower48, &center, surfaceMax.y);

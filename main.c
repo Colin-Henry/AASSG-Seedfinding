@@ -147,7 +147,260 @@ int main(int argc, char *argv[])
     
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
-    
+
+    if (rank == 0)
+    {
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastions
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionSeeds/fastionSeeds_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.fastionSeeds);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastions
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionSeeds/ssvFastionSeeds_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionSeeds);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeeds/fastionEndCitySeeds_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeeds);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities with coords
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeedsWithCoords/fastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeedsWithCoords);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeeds/ssvFastionEndCitySeeds_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeeds);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities with coords
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeedsWithCoords/ssvFastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeedsWithCoords);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeeds/fastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeeds);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships with coords
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeedsWithCoords/fastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeedsWithCoords);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeeds/ssvFastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeeds);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+
+        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships with coords
+        {
+            char tempFile[100];
+            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeedsWithCoords/ssvFastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
+        
+            // Open the input file
+            FILE *tempInputFile = fopen(tempFile, "r");
+            if (tempInputFile == NULL) 
+            {
+                perror("Error opening input file");
+                return EXIT_FAILURE;
+            }
+
+            // Read and write contents of input file directly to the output file
+            char buffer[1024];
+            size_t bytesRead;
+            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            {
+                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeedsWithCoords);
+            }
+
+            // Close the input file
+            fclose(tempInputFile);
+        }
+    }
+  
     double endTime = MPI_Wtime(); // End time of the computation
 
     // Calculate total time on rank 0
@@ -178,6 +431,7 @@ int main(int argc, char *argv[])
 
 // For SSV Fastion, End Ship City Seeds
 // Est. structure seeds: 352,321,536 seeds (Based on 21 results for 16777216 seeds)
+// Est. time: 3466.12621 hr
 
 // Fastion results match cubiomesViewer (tested from 0-2^32)
 
@@ -187,4 +441,5 @@ int main(int argc, char *argv[])
 // Sort data A-Z
 // Additional testing if needed
 // Optimization if needed
+// Speed up gateway finder
 // Update github accordingly
