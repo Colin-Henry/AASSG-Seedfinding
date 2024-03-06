@@ -412,7 +412,6 @@ Pos getMainGateway(uint64_t lower48) {
     return gateways[ix];
 }
 
-
 Pos3 linkedGateway(uint64_t lower48)
 {
 	Pos maingateway = getMainGateway(lower48);
@@ -539,8 +538,8 @@ bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
     setupGenerator(&endBiomeSource, MC_1_16_1, 0);
     SurfaceNoise endSurfaceNoise;
     initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
-
     applySeed(&endBiomeSource, DIM_END, lower48);
+
     if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords->x, endCityCoords->z, 0)) // Checking if it can generate due to biomes
         return false;
 
@@ -556,6 +555,37 @@ bool checkForShip(uint64_t lower48, Pos endCityCoords)
     for (int currentPiece = 0; currentPiece <= numberOfPieces; currentPiece++)
         if (endCityPieces[currentPiece].type == END_SHIP)
             return true;
+    
+    return false;
+}
+
+// WIP
+
+bool roughEndCityChecker(uint64_t lower48) // Checking if all the regions don't have a structure, then returning false (this seed doesn't have an end city) if so
+{
+    Generator endBiomeSource;
+    setupGenerator(&endBiomeSource, MC_1_16_1, 0);
+    SurfaceNoise endSurfaceNoise;
+    initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
+    applySeed(&endBiomeSource, DIM_END, lower48);
+
+    Pos tempCoords = {0, 0};
+
+    for (int regX = -4; regX <= 4; regX++)
+    {
+        for (int regZ = -4; regZ <= 4; regZ++)
+        {
+            if (isViableStructurePos(End_City, &endBiomeSource, tempCoords.x, tempCoords.z, 0)) // Checking if it can generate due to biomes
+                return true;
+
+            if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, tempCoords.x, tempCoords.z))// Checking if it can generate (if y >= 60)
+                return true;
+        }
+    }
+
+    
+    
+    printf("%ld\n", lower48);
     
     return false;
 }

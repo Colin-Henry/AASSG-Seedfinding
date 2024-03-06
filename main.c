@@ -49,48 +49,8 @@ int main(int argc, char *argv[])
 
         Generator biomeSource;
         setupGenerator(&biomeSource, MC_1_16_1, 0);
-
     
-        char fastionSeedsFilename[1000]; // Arbitrary size, but is big enough to fit all names and takes very little memory
-        snprintf(fastionSeedsFilename, sizeof(fastionSeedsFilename), "Output/Temp/fastionSeeds/fastionSeeds_temp_%d.txt", rank); // Generate unique filename for each process
-        FILE *fastionSeeds = fopen(fastionSeedsFilename, "w");
-
-        char ssvFastionSeedsFilename[1000];
-        snprintf(ssvFastionSeedsFilename, sizeof(ssvFastionSeedsFilename), "Output/Temp/ssvFastionSeeds/ssvFastionSeeds_temp_%d.txt", rank);
-        FILE *ssvFastionSeeds = fopen(ssvFastionSeedsFilename, "w");
-
-        char fastionEndCitySeedsFilename[1000];
-        snprintf(fastionEndCitySeedsFilename, sizeof(fastionEndCitySeedsFilename), "Output/Temp/fastionEndCitySeeds/fastionEndCitySeeds_temp_%d.txt", rank);
-        FILE *fastionEndCitySeeds = fopen(fastionEndCitySeedsFilename, "w");
-
-        char fastionEndCitySeedsWithCoordsFilename[1000];
-        snprintf(fastionEndCitySeedsWithCoordsFilename, sizeof(fastionEndCitySeedsWithCoordsFilename), "Output/Temp/fastionEndCitySeedsWithCoords/fastionEndCitySeedsWithCoords_temp_%d.txt", rank);
-        FILE *fastionEndCitySeedsWithCoords = fopen(fastionEndCitySeedsWithCoordsFilename, "w");
-
-        char ssvFastionEndCitySeedsFilename[1000];
-        snprintf(ssvFastionEndCitySeedsFilename, sizeof(ssvFastionEndCitySeedsFilename), "Output/Temp/ssvFastionEndCitySeeds/ssvFastionEndCitySeeds_temp_%d.txt", rank);
-        FILE *ssvFastionEndCitySeeds = fopen(ssvFastionEndCitySeedsFilename, "w");
-
-        char ssvFastionEndCitySeedsWithCoordsFilename[1000];
-        snprintf(ssvFastionEndCitySeedsWithCoordsFilename, sizeof(ssvFastionEndCitySeedsWithCoordsFilename), "Output/Temp/ssvFastionEndCitySeedsWithCoords/ssvFastionEndCitySeedsWithCoords_temp_%d.txt", rank);
-        FILE *ssvFastionEndCitySeedsWithCoords = fopen(ssvFastionEndCitySeedsWithCoordsFilename, "w");
-
-        char fastionEndCityShipSeedsFilename[1000];
-        snprintf(fastionEndCityShipSeedsFilename, sizeof(fastionEndCityShipSeedsFilename), "Output/Temp/fastionEndCityShipSeeds/fastionEndCityShipSeeds_temp_%d.txt", rank);
-        FILE *fastionEndCityShipSeeds = fopen(fastionEndCityShipSeedsFilename, "w");
-
-        char fastionEndCityShipSeedsWithCoordsFilename[1000];
-        snprintf(fastionEndCityShipSeedsWithCoordsFilename, sizeof(fastionEndCityShipSeedsWithCoordsFilename), "Output/Temp/fastionEndCityShipSeedsWithCoords/fastionEndCityShipSeedsWithCoords_temp_%d.txt", rank);
-        FILE *fastionEndCityShipSeedsWithCoords = fopen(fastionEndCityShipSeedsWithCoordsFilename, "w");
-
-        char ssvFastionEndCityShipSeedsFilename[1000];
-        snprintf(ssvFastionEndCityShipSeedsFilename, sizeof(ssvFastionEndCityShipSeedsFilename), "Output/Temp/ssvFastionEndCityShipSeeds/ssvFastionEndCityShipSeeds_temp_%d.txt", rank);
-        FILE *ssvFastionEndCityShipSeeds = fopen(ssvFastionEndCityShipSeedsFilename, "w");
-
-        char ssvFastionEndCityShipSeedsWithCoordsFilename[1000];
-        snprintf(ssvFastionEndCityShipSeedsWithCoordsFilename, sizeof(ssvFastionEndCityShipSeedsWithCoordsFilename), "Output/Temp/ssvFastionEndCityShipSeedsWithCoords/ssvFastionEndCityShipSeedsWithCoords_temp_%d.txt", rank);
-        FILE *ssvFastionEndCityShipSeedsWithCoords = fopen(ssvFastionEndCityShipSeedsWithCoordsFilename, "w");
-
+        threadFileOpener(&threadFileManagement, rank);
 
         for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
         {
@@ -98,339 +58,51 @@ int main(int argc, char *argv[])
 
             if (isFastion)
             {
-                fprintf(fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+                fprintf(threadFileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
 
                 bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
                 if (isSSV)
-                    fprintf(ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
+                //if (!roughEndCityChecker(currentStructureSeed))
+                    //continue;
                 
                 bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords); // Need to add in coord returns for coord printing
                 if (isEndCity)
                 {
-                    fprintf(fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
-                    fprintf(fastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                    fprintf(threadFileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
+                    fprintf(threadFileManagement.fastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
 
                     if (isSSV)
                     {
-                        fprintf(ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
-                        fprintf(ssvFastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                        fprintf(threadFileManagement.ssvFastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
+                        fprintf(threadFileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
                     }
                     
                     bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords); // Need to add in coord returns for coord printing
                     if (isEndCityShip)
                     {
-                        fprintf(fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
-                        fprintf(fastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                        fprintf(threadFileManagement.fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
+                        fprintf(threadFileManagement.fastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
 
                         if (isSSV)
                         {
-                            fprintf(ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
-                            fprintf(ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
+                            fprintf(threadFileManagement.ssvFastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
+                            fprintf(threadFileManagement.ssvFastionEndCityShipSeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
                         }
                     }
                 }
             }
         }
 
-        fclose(fastionSeeds);
-        fclose(ssvFastionSeeds);
-        fclose(fastionEndCitySeeds);
-        fclose(fastionEndCitySeedsWithCoords);
-        fclose(ssvFastionEndCitySeeds);
-        fclose(ssvFastionEndCitySeedsWithCoords);
-        fclose(fastionEndCityShipSeeds);
-        fclose(fastionEndCityShipSeedsWithCoords);
-        fclose(ssvFastionEndCityShipSeeds);
-        fclose(ssvFastionEndCityShipSeedsWithCoords);
+        threadFileCloser(&threadFileManagement);
     }
     
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
 
-    if (rank == 0)
-    {
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastions
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionSeeds/fastionSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            // Copying over everything from the temp file to the main file
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionSeeds);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) // Deleteing the old temp file to save space (can remove this if it takes too long but shouldn't)
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastions
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionSeeds/ssvFastionSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionSeeds);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeeds/fastionEndCitySeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeeds);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities with coords
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeedsWithCoords/fastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeedsWithCoords);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeeds/ssvFastionEndCitySeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeeds);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities with coords
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeedsWithCoords/ssvFastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeedsWithCoords);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeeds/fastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeeds);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships with coords
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeedsWithCoords/fastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeedsWithCoords);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeeds/ssvFastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeeds);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships with coords
-        {
-            char tempFile[100];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeedsWithCoords/ssvFastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-            {
-                perror("Error opening input file");
-                return EXIT_FAILURE;
-            }
-
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-            {
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeedsWithCoords);
-            }
-
-            fclose(tempInputFile);
-
-            if (remove(tempFile) != 0) 
-            {
-                perror("Error deleting temporary file");
-                return EXIT_FAILURE;
-            }
-        }
-    }
+    if (rank == 0) // Writing everything to the main file and deleting the temp files as it goes
+        mainFileWriterAndDeleter(size);
   
     double endTime = MPI_Wtime();
 
