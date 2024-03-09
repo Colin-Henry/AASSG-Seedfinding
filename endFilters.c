@@ -565,7 +565,7 @@ bool isEndCityNearby(uint64_t lower48, Generator* endBiomeSource, SurfaceNoise* 
 {    
     // array of regions that need to be checked for each main gateway position (index)
     // dynamic allocation would save some memory, but since it's just 160 ints it shouldn't be an issue
-    static const Pos regions[20][4] = {
+    static Pos regions[20][4] = {
         {{2, 0}, {3, 0}, {4, 0}},
         {{2, 0}, {2, 1}, {3, 1}, {4, 1}},
         {{2, 1}, {2, 2}, {3, 2}},
@@ -600,9 +600,9 @@ bool isEndCityNearby(uint64_t lower48, Generator* endBiomeSource, SurfaceNoise* 
 
         if (getStructurePos(End_City, MC_1_16_1, lower48, regionList[i].x, regionList[i].z, &cityCoords))
         {
-            if (isViableStructurePos(End_City, &endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
+            if (isViableStructurePos(End_City, (Generator *)endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
             {
-                if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
+                if (isViableEndCityTerrain((Generator *)endBiomeSource, (SurfaceNoise *)endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
                     return true; // This seed has an end city. If the loops didn't finish, this seed didn't have an end city and returns false (hence final return statement being false)
             }
         }
@@ -621,148 +621,4 @@ bool roughEndCityChecker(uint64_t lower48) // Checking if all the regions don't 
     applySeed(&endBiomeSource, DIM_END, lower48);
 
     return isEndCityNearby(lower48, &endBiomeSource, &endSurfaceNoise);
-
-    /*
-    Pos tempCoords = {0, 0};    
-    Pos mainGateway = getMainGateway(lower48);
-    
-    if ((mainGateway.x == 96) && (mainGateway.z == 0))
-    {
-        for (int regX = 0; regX <= 4; regX++)
-        {
-            for (int regZ = -1; regZ <= 0; regZ++)
-            {
-                if (getStructurePos(End_City, MC_1_16_1, lower48, regX, regZ, &tempCoords))
-                {
-                    if (isViableStructurePos(End_City, &endBiomeSource, tempCoords.x, tempCoords.z, 0)) // Checking if it can generate due to biomes
-                    {
-                        if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, tempCoords.x, tempCoords.z)) // Checking if it can generate (if y >= 60)
-                            return true; // This seed has an end city. If the loops didn't finish, this seed didn't have an end city and returns false (hence final return statement being false)
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    if ((mainGateway.x == 91) && (mainGateway.z == 29))
-    {
-
-    }
-    if ((mainGateway.x == 77) && (mainGateway.z == 56))
-    {
-
-    }
-    if ((mainGateway.x == 56) && (mainGateway.z == 77))
-    {
-
-    }
-    if ((mainGateway.x == 29) && (mainGateway.z == 91))
-    {
-
-    }
-    if ((mainGateway.x == -1) && (mainGateway.z == 96))
-    {
-        for (int regX = -1; regX <= 0; regX++)
-        {
-            for (int regZ = 0; regZ <= 4; regZ++)
-            {
-                if (getStructurePos(End_City, MC_1_16_1, lower48, regX, regZ, &tempCoords))
-                {
-                    if (isViableStructurePos(End_City, &endBiomeSource, tempCoords.x, tempCoords.z, 0))
-                    {
-                        if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, tempCoords.x, tempCoords.z))
-                            return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    if ((mainGateway.x == -30) && (mainGateway.z == 91))
-    {
-        
-    }
-    if ((mainGateway.x == -57) && (mainGateway.z == 77))
-    {
-
-    }
-    if ((mainGateway.x == -78) && (mainGateway.z == 56))
-    {
-
-    }
-    if ((mainGateway.x == -92) && (mainGateway.z == 29))
-    {
-
-    }
-    if ((mainGateway.x == -96) && (mainGateway.z == -1))
-    {
-        for (int regX = -1; regX <= -5; regX++)
-        {
-            for (int regZ = -1; regZ <= 0; regZ++)
-            {
-                if (getStructurePos(End_City, MC_1_16_1, lower48, regX, regZ, &tempCoords))
-                {
-                    if (isViableStructurePos(End_City, &endBiomeSource, tempCoords.x, tempCoords.z, 0))
-                    {
-                        if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, tempCoords.x, tempCoords.z))
-                            return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    if ((mainGateway.x == -92) && (mainGateway.z == -30))
-    {
-
-    }
-    if ((mainGateway.x == -78) && (mainGateway.z == -57))
-    {
-
-    }
-    if ((mainGateway.x == -57) && (mainGateway.z == -78))
-    {
-
-    }
-    if ((mainGateway.x == -30) && (mainGateway.z == -92))
-    {
-
-    }
-    if ((mainGateway.x == 0) && (mainGateway.z == -96))
-    {
-        for (int regX = -1; regX <= 0; regX++)
-        {
-            for (int regZ = -3; regZ <= -5; regZ++)
-            {
-                if (getStructurePos(End_City, MC_1_16_1, lower48, regX, regZ, &tempCoords))
-                {
-                    if (isViableStructurePos(End_City, &endBiomeSource, tempCoords.x, tempCoords.z, 0))
-                    {
-                        if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, tempCoords.x, tempCoords.z))
-                            return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    if ((mainGateway.x == 29) && (mainGateway.z == -92))
-    {
-
-    }
-    if ((mainGateway.x == 56) && (mainGateway.z == -78))
-    {
-
-    }
-    if ((mainGateway.x == 77) && (mainGateway.z == -57))
-    {
-
-    }
-    if ((mainGateway.x == 91) && (mainGateway.z == -30))
-    {
-
-    }
-
-    return true;
-    */
 }
