@@ -561,31 +561,38 @@ bool checkForShip(uint64_t lower48, Pos endCityCoords)
 
 // WIP
 
-bool isEndCityNearby(uint64_t lower48, Generator* endBiomeSource, SurfaceNoise* endSurfaceNoise)
+bool isEndCityNearby(uint64_t lower48)
 {    
+    Generator endBiomeSource;
+    setupGenerator(&endBiomeSource, MC_1_16_1, 0);
+    SurfaceNoise endSurfaceNoise;
+    initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
+    applySeed(&endBiomeSource, DIM_END, lower48);
+
     // array of regions that need to be checked for each main gateway position (index)
-    // dynamic allocation would save some memory, but since it's just 200 ints it shouldn't be an issue
-    static Pos regions[20][5] = {
-		{{2, 0}, {3, 0}, {4, 0}},
-		{{2, 0}, {2, 1}, {3, 1}, {4, 1}},
-		{{2, 1}, {2, 2}, {3, 2}},
-		{{1, 2}, {2, 2}, {2, 3}},
-		{{0, 2}, {1, 2}, {1, 3}, {1, 4}},
-		{{0, 2}, {0, 3}, {0, 4}},
-		{{-2, 3}, {-2, 4}, {-1, 2}, {-1, 3}, {-1, 4}},
-		{{-3, 3}, {-2, 2}, {-2, 3}},
-		{{-4, 2}, {-3, 1}, {-3, 2}, {-2, 1}, {-2, 2}},
-		{{-4, 1}, {-3, 0}, {-3, 1}, {-2, 0}, {-2, 1}},
-		{{-4, 0}, {-3, 0}},
-		{{-4, -2}, {-4, -1}, {-3, -1}, {-2, -1}},
-		{{-4, -3}, {-4, -2}, {-3, -3}, {-3, -2}, {-2, -2}},
-		{{-3, -4}, {-3, -3}, {-2, -4}, {-2, -3}, {-2, -2}},
-		{{-2, -4}, {-1, -4}, {-1, -3}, {-1, -2}},
-		{{0, -4}, {0, -3}},
-		{{0, -3}, {0, -2}, {1, -4}, {1, -3}, {1, -2}},
-		{{1, -3}, {1, -2}, {2, -4}, {2, -3}, {2, -2}},
-		{{2, -2}, {3, -3}, {3, -2}},
-		{{2, -1}, {3, -2}, {3, -1}, {4, -2}, {4, -1}}
+    // dynamic allocation would save some memory, but since it's just 160 ints it shouldn't be an issue
+    static Pos regions[20][5] = 
+    {
+        {{2, 0}, {3, 0}, {4, 0}},
+        {{2, 0}, {2, 1}, {3, 1}, {4, 1}},
+        {{2, 1}, {2, 2}, {3, 2}},
+        {{1, 2}, {2, 2}, {2, 3}},
+        {{0, 2}, {1, 2}, {1, 3}, {1, 4}},
+        {{0, 2}, {0, 3}, {0, 4}},
+        {{-2, 3}, {-2, 4}, {-1, 2}, {-1, 3}, {-1, 4}},
+        {{-3, 3}, {-2, 2}, {-2, 3}},
+        {{-4, 2}, {-3, 1}, {-3, 2}, {-2, 1}, {-2, 2}},
+        {{-4, 1}, {-3, 0}, {-3, 1}, {-2, 0}, {-2, 1}},
+        {{-4, 0}, {-3, 0}},
+        {{-4, -2}, {-4, -1}, {-3, -1}, {-2, -1}},
+        {{-4, -3}, {-4, -2}, {-3, -3}, {-3, -2}, {-2, -2}},
+        {{-3, -4}, {-3, -3}, {-2, -4}, {-2, -3}, {-2, -2}},
+        {{-2, -4}, {-1, -4}, {-1, -3}, {-1, -2}},
+        {{0, -4}, {0, -3}},
+        {{0, -3}, {0, -2}, {1, -4}, {1, -3}, {1, -2}},
+        {{1, -3}, {1, -2}, {2, -4}, {2, -3}, {2, -2}},
+        {{2, -2}, {3, -3}, {3, -2}},
+        {{2, -1}, {3, -2}, {3, -1}, {4, -2}, {4, -1}}
     };
 
     uint64_t rng = 0;
@@ -594,31 +601,19 @@ bool isEndCityNearby(uint64_t lower48, Generator* endBiomeSource, SurfaceNoise* 
     Pos* regionList = regions[ix];
 
     // iterate only the viable region positions within the region list
-    for (int i = 0; i < 5 && (regionList[i].x != 0 || regionList[i].z != 0); i++)
+    for (int i = 0; i < 3 && (regionList[i].x != 0 || regionList[i].z != 0); i++)
     {
         Pos cityCoords = {0, 0};
 
         if (getStructurePos(End_City, MC_1_16_1, lower48, regionList[i].x, regionList[i].z, &cityCoords))
         {
-            if (isViableStructurePos(End_City, (Generator *)endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
+            if (isViableStructurePos(End_City, &endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
             {
-                if (isViableEndCityTerrain((Generator *)endBiomeSource, (SurfaceNoise *)endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
+                if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
                     return true; // This seed has an end city. If the loops didn't finish, this seed didn't have an end city and returns false (hence final return statement being false)
             }
         }
     }
 
     return false;
-}
-
-
-bool roughEndCityChecker(uint64_t lower48) // Checking if all the regions don't have a structure, then returning false (this seed doesn't have an end city) if so
-{
-    Generator endBiomeSource;
-    setupGenerator(&endBiomeSource, MC_1_16_1, 0);
-    SurfaceNoise endSurfaceNoise;
-    initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
-    applySeed(&endBiomeSource, DIM_END, lower48);
-
-    return isEndCityNearby(lower48, &endBiomeSource, &endSurfaceNoise);
 }

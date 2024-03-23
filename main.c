@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         uint64_t endIteration = rank * iterationsPerProcess - 1 + startingStructureSeed;
         if (rank == size - 1) 
         {
-            endIteration += extraIterations; // Add extra iterations to the last process
+            endIteration += extraIterations; // Add extra seeds to the last process
         }
 
         Pos bastions[4], forts[4];
@@ -64,10 +64,10 @@ int main(int argc, char *argv[])
                 if (isSSV)
                     fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                if (!roughEndCityChecker(currentStructureSeed))
+                if (!isEndCityNearby(currentStructureSeed))
                     continue;
                 
-                bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords); // Need to add in coord returns for coord printing
+                bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords);
                 if (isEndCity)
                 {
                     fprintf(threadFileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
                         fprintf(threadFileManagement.ssvFastionEndCitySeedsWithCoords, "%" PRId64 " %d %d\n", currentStructureSeed, gatewayCoords.x, gatewayCoords.z);
                     }
                     
-                    bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords); // Need to add in coord returns for coord printing
+                    bool isEndCityShip = checkForShip(currentStructureSeed, endCityCoords);
                     if (isEndCityShip)
                     {
                         fprintf(threadFileManagement.fastionEndCityShipSeeds, "%" PRId64 "\n", currentStructureSeed);
