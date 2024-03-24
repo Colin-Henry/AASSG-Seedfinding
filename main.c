@@ -49,6 +49,11 @@ int main(int argc, char *argv[])
 
         Generator biomeSource;
         setupGenerator(&biomeSource, MC_1_16_1, 0);
+        Generator endBiomeSource;
+        setupGenerator(&endBiomeSource, MC_1_16_1, 0);
+        SurfaceNoise endSurfaceNoise;
+        initSurfaceNoise(&endSurfaceNoise, DIM_END, currentStructureSeed); 
+        applySeed(&endBiomeSource, DIM_END, currentStructureSeed);
     
         threadFileOpener(&threadFileManagement, rank);
 
@@ -64,7 +69,7 @@ int main(int argc, char *argv[])
                 if (isSSV)
                     fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                if (!isEndCityNearby(currentStructureSeed))
+                if (!isEndCityNearby(currentStructureSeed, &endBiomeSource, &endSurfaceNoise))
                     continue;
                 
                 bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords);
@@ -138,9 +143,7 @@ int main(int argc, char *argv[])
 // Fastion results match cubiomesViewer (tested from 0-2^32)
 
 // TODO:
-// Make the thread-safe stuff look better
 // Add a seed counter for all types and print data to console
 // Additional testing if needed
 // Optimization if needed
-// Speed up gateway finder
 // Update github accordingly

@@ -523,7 +523,7 @@ Pos3 linkedGateway(uint64_t lower48)
 
 bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
 {
-    *gatewayCoords = linkedGateway(lower48); // This whole function makes the program ~435x slower and I have no idea if there's gonna be a way to speed it up :(
+    *gatewayCoords = linkedGateway(lower48); // Man source of slowdown for program
     Pos endCityRegionCoords = {floor(gatewayCoords->x / (double)(16 * 20)), floor(gatewayCoords->z / (double)(16 * 20))};
 
     if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, endCityCoords)) // See if theres a generation attempt within the region
@@ -561,13 +561,13 @@ bool checkForShip(uint64_t lower48, Pos endCityCoords)
 
 // WIP
 
-bool isEndCityNearby(uint64_t lower48)
+bool isEndCityNearby(uint64_t lower48, const Generator* endBiomeSource, const SurfaceNoise* endSurfaceNoise)
 {    
-    Generator endBiomeSource;
+    /* Generator endBiomeSource;
     setupGenerator(&endBiomeSource, MC_1_16_1, 0);
     SurfaceNoise endSurfaceNoise;
     initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
-    applySeed(&endBiomeSource, DIM_END, lower48);
+    applySeed(&endBiomeSource, DIM_END, lower48); */
 
     // array of regions that need to be checked for each main gateway position (index)
     // dynamic allocation would save some memory, but since it's just 160 ints it shouldn't be an issue
@@ -601,15 +601,15 @@ bool isEndCityNearby(uint64_t lower48)
     Pos* regionList = regions[ix];
 
     // iterate only the viable region positions within the region list
-    for (int i = 0; i < 3 && (regionList[i].x != 0 || regionList[i].z != 0); i++)
+    for (int i = 0; i < 5 && (regionList[i].x != 0 || regionList[i].z != 0); i++)
     {
         Pos cityCoords = {0, 0};
 
         if (getStructurePos(End_City, MC_1_16_1, lower48, regionList[i].x, regionList[i].z, &cityCoords))
         {
-            if (isViableStructurePos(End_City, &endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
+            if (isViableStructurePos(End_City, (Generator *)endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
             {
-                if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
+                if (isViableEndCityTerrain((Generator *)endBiomeSource, (SurfaceNoise *)endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
                     return true; // This seed has an end city. If the loops didn't finish, this seed didn't have an end city and returns false (hence final return statement being false)
             }
         }
