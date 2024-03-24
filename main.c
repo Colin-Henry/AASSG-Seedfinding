@@ -49,11 +49,11 @@ int main(int argc, char *argv[])
 
         Generator biomeSource;
         setupGenerator(&biomeSource, MC_1_16_1, 0);
-        Generator endBiomeSource;
-        setupGenerator(&endBiomeSource, MC_1_16_1, 0);
+        // Generator endBiomeSource;
+        // setupGenerator(&endBiomeSource, MC_1_16_1, 0);
         SurfaceNoise endSurfaceNoise;
         initSurfaceNoise(&endSurfaceNoise, DIM_END, currentStructureSeed); 
-        applySeed(&endBiomeSource, DIM_END, currentStructureSeed);
+        applySeed(&biomeSource, DIM_END, currentStructureSeed);
     
         threadFileOpener(&threadFileManagement, rank);
 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
                 if (isSSV)
                     fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                if (!isEndCityNearby(currentStructureSeed, &endBiomeSource, &endSurfaceNoise))
+                if (!isEndCityNearby(currentStructureSeed, &biomeSource, &endSurfaceNoise))
                     continue;
                 
                 bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords);

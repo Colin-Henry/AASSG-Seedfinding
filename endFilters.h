@@ -117,6 +117,6 @@ Pos3 linkedGateway(uint64_t lower48);
 void sampleNoiseColumnEnd(double column[], const SurfaceNoise *sn, const EndNoise *en, int x, int z, int colymin, int colymax);
 int getSurfaceHeight(const double ncol00[], const double ncol01[], const double ncol10[], const double ncol11[], int colymin, int colymax, int blockspercell, double dx, double dz);
 
-bool isEndCityNearby(uint64_t lower48, const Generator* endBiomeSource, const SurfaceNoise* endSurfaceNoise);
+bool isEndCityNearby(uint64_t lower48, Generator* endBiomeSource, SurfaceNoise* endSurfaceNoise);
 bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords);
 bool checkForShip(uint64_t lower48, Pos endCityCoords);

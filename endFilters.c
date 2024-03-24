@@ -561,7 +561,7 @@ bool checkForShip(uint64_t lower48, Pos endCityCoords)
 
 // WIP
 
-bool isEndCityNearby(uint64_t lower48, const Generator* endBiomeSource, const SurfaceNoise* endSurfaceNoise)
+bool isEndCityNearby(uint64_t lower48, Generator* endBiomeSource, SurfaceNoise* endSurfaceNoise)
 {    
     /* Generator endBiomeSource;
     setupGenerator(&endBiomeSource, MC_1_16_1, 0);
@@ -607,9 +607,9 @@ bool isEndCityNearby(uint64_t lower48, const Generator* endBiomeSource, const Su
 
         if (getStructurePos(End_City, MC_1_16_1, lower48, regionList[i].x, regionList[i].z, &cityCoords))
         {
-            if (isViableStructurePos(End_City, (Generator *)endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
+            if (isViableStructurePos(End_City, endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
             {
-                if (isViableEndCityTerrain((Generator *)endBiomeSource, (SurfaceNoise *)endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
+                if (isViableEndCityTerrain(endBiomeSource, endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
                     return true; // This seed has an end city. If the loops didn't finish, this seed didn't have an end city and returns false (hence final return statement being false)
             }
         }
