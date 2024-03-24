@@ -49,11 +49,6 @@ int main(int argc, char *argv[])
 
         Generator biomeSource;
         setupGenerator(&biomeSource, MC_1_16_1, 0);
-        // Generator endBiomeSource;
-        // setupGenerator(&endBiomeSource, MC_1_16_1, 0);
-        SurfaceNoise endSurfaceNoise;
-        initSurfaceNoise(&endSurfaceNoise, DIM_END, currentStructureSeed); 
-        applySeed(&biomeSource, DIM_END, currentStructureSeed);
     
         threadFileOpener(&threadFileManagement, rank);
 
@@ -69,7 +64,7 @@ int main(int argc, char *argv[])
                 if (isSSV)
                     fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                if (!isEndCityNearby(currentStructureSeed, &biomeSource, &endSurfaceNoise))
+                if (!isEndCityNearby(currentStructureSeed))
                     continue;
                 
                 bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords);
@@ -138,7 +133,7 @@ int main(int argc, char *argv[])
 
 // For SSV Fastion, End Ship City Seeds
 // Est. structure seeds: 352,321,536 seeds (Based on 21 results for 16777216 seeds)
-// Est. time: 3466.12621 hr
+// Est. time: 627.128321 hr
 
 // Fastion results match cubiomesViewer (tested from 0-2^32)
 
