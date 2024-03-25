@@ -49,9 +49,9 @@ bool checkStructureReqs(const Generator* biomeSource, Pos* bast, Pos* fort)
 {
     if (!checkStructureDistances(bast, fort))
         return false;
-    else
-
-    applySeed((Generator *)biomeSource, DIM_NETHER, currentStructureSeed);
+        
+    //else
+    //applySeed((Generator *)biomeSource, DIM_NETHER, currentStructureSeed);
 
     if ((getBiomeAt(biomeSource, 4, (bast->x >> 2) + 2, 0, (bast->z >> 2) + 2)) == basalt_deltas)
         return false; // check if bastion spawns
