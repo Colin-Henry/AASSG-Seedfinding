@@ -51,20 +51,23 @@ typedef struct {
 } NoiseRegion;
 
 typedef struct {
+    uint64_t seed;
+
+    Generator biomeSource;
     SurfaceNoise surfaceNoise;
     EndNoise endNoise;
+
     NoiseRegion noiseRegion;
-    uint64_t seed;
-} EndTerrainNoise;
+} EndContext;
 
 // -----------------------
 // inline functs, helpers
 // -----------------------
 
-inline int min(const int a, const int b) 
+inline int min_(const int a, const int b) 
 { return a < b ? a : b; }
 
-inline int max(const int a, const int b) 
+inline int max_(const int a, const int b) 
 { return a > b ? a : b; }
 
 inline void setPos(Pos3* const pos, const int x, const int y, const int z) 
@@ -99,24 +102,26 @@ bool anyIslandIntersectsChunk(ref(EndIslandPair) islandPair, int chunkX, int chu
 void addIntersectingIslands(EndIsland *arr, int *arrSize, ref(EndIslandPair) islandPair, ref(BlockArea) area, int minHeight);
 
 uint64_t getPopSeed(uint64_t ws, int x, int z);
-EndIslandPair generateIslands(Generator *endBiomeGenerator, uint64_t lower48, int xCoordinate, int zCoordinate);
+EndIslandPair generateIslands(ref(EndContext) ctx, int xCoordinate, int zCoordinate);
 Pos3 getTopPriorityBlock(ref(EndIsland) island, ref(BlockArea) area);
-Pos3 getIslandTallestBlock(Generator *endBiomeGenerator, uint64_t lower48, ref(Pos3) center, const int maxSurfaceHeight);
-bool chunkHasIslandBlocks(ref(Pos) chunkPos, Generator *endBiomeGenerator, uint64_t lower48);
+Pos3 getIslandTallestBlock(ref(EndContext) ctx, ref(Pos3) center, const int maxSurfaceHeight);
+bool chunkHasIslandBlocks(ref(EndContext) ctx, ref(Pos) chunkPos);
 
-void initEndTerrainNoise(EndTerrainNoise *const etn, uint64_t lower48);
-void sampleColumn(EndTerrainNoise *const etn, int cellX, int cellZ, const int minX, const int minZ);
-void sampleNoiseColumnsCached(EndTerrainNoise *const etn, bool noiseCalculated[][NOISE_REGION_SIZE], int cellX, int cellZ, const int minX, const int minZ);
-int getHeightAt(EndTerrainNoise *const etn, int arrayCellX, int arrayCellZ, int x, int z);
-bool chunkHasTerrainBlocks(ref(Pos) chunkPos, EndTerrainNoise *const etn, bool minHeight30);
-Pos3 getTerrainTallestBlock(ref(Pos3) center, EndTerrainNoise *const etn);
+void initEndContext(EndContext* const ctx, uint64_t lower48);
+void sampleColumn(EndContext* const ctx, int cellX, int cellZ, const int minX, const int minZ);
+void sampleNoiseColumnsCached(EndContext* const ctx, bool noiseCalculated[][NOISE_REGION_SIZE], int cellX, int cellZ, const int minX, const int minZ);
+int getHeightAt(ref(EndContext) ctx, int arrayCellX, int arrayCellZ, int x, int z);
+bool chunkHasTerrainBlocks(EndContext* const ctx, ref(Pos) chunkPos, bool minHeight30);
+Pos3 getTerrainTallestBlock(EndContext* const ctx, ref(Pos3) center);
 
 Pos getMainGateway(uint64_t lower48);
-Pos3 linkedGateway(uint64_t lower48);
+Pos3 linkedGateway(EndContext* const ctx);
 
+// --- Cubiomes functions? ---
 void sampleNoiseColumnEnd(double column[], const SurfaceNoise *sn, const EndNoise *en, int x, int z, int colymin, int colymax);
 int getSurfaceHeight(const double ncol00[], const double ncol01[], const double ncol10[], const double ncol11[], int colymin, int colymax, int blockspercell, double dx, double dz);
+// ---------------------------
 
-bool isEndCityNearby(uint64_t lower48);
-bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords);
+bool isEndCityNearby(EndContext* const ctx);
+bool findEndCities(EndContext* const ctx, Pos* endCityCoords, Pos3* gatewayCoords);
 bool checkForShip(uint64_t lower48, Pos endCityCoords);

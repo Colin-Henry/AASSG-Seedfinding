@@ -106,16 +106,16 @@ uint64_t getPopSeed(uint64_t ws, int x, int z)
 }
 
 
-EndIslandPair generateIslands(Generator* endBiomeGenerator, uint64_t lower48, int xCoordinate, int zCoordinate)
+EndIslandPair generateIslands(ref(EndContext) ctx, int xCoordinate, int zCoordinate)
 {
     EndIslandPair islandPair = {0}; // empty initializer -> all fields get set to 0
 
-    int biome = getBiomeAt(endBiomeGenerator, 4, (xCoordinate >> 2) + 2, 2, (zCoordinate >> 2) + 2); // getNoiseBiome()
+    int biome = getBiomeAt(&(ctx->biomeSource), 4, (xCoordinate >> 2) + 2, 2, (zCoordinate >> 2) + 2); // getNoiseBiome()
     if (biome != small_end_islands)
         return islandPair;
     
     uint64_t rng = 0;
-    setSeed(&rng, getPopSeed(lower48, xCoordinate, zCoordinate));
+    setSeed(&rng, getPopSeed(ctx->seed, xCoordinate, zCoordinate));
     int rngResult = nextInt(&rng, 14); // Checking for 1/14 chance to generate
     if (rngResult != 0) // No small island in that chunk
         return islandPair;
@@ -157,10 +157,10 @@ EndIslandPair generateIslands(Generator* endBiomeGenerator, uint64_t lower48, in
 // returns the block position within an island prioritized by the source code impl. of getTallestBlock()
 Pos3 getTopPriorityBlock(ref(EndIsland) island, ref(BlockArea) area) {
     int d = ceil(island->r + RD);
-    int islandMinX = max(island->pos.x - d, area->minX);
-    int islandMinZ = max(island->pos.z - d, area->minZ);
-    int islandMaxX = min(island->pos.x + d, area->maxX);
-    int islandMaxZ = min(island->pos.z + d, area->maxZ);
+    int islandMinX = max_(island->pos.x - d, area->minX);
+    int islandMinZ = max_(island->pos.z - d, area->minZ);
+    int islandMaxX = min_(island->pos.x + d, area->maxX);
+    int islandMaxZ = min_(island->pos.z + d, area->maxZ);
 
     bool halted = false;
     for (int x = islandMinX; !halted && x <= islandMaxX; x++) 
@@ -179,7 +179,7 @@ Pos3 getTopPriorityBlock(ref(EndIsland) island, ref(BlockArea) area) {
 }
 
 // returns the result of getTallestBlock() for small end islands within a 33x33 area around the [center] block
-Pos3 getIslandTallestBlock(Generator* endBiomeGenerator, uint64_t lower48, ref(Pos3) center, const int maxSurfaceHeight) 
+Pos3 getIslandTallestBlock(ref(EndContext) ctx, ref(Pos3) center, const int maxSurfaceHeight) 
 {
     // finds the maximum height (and position where it occurs) of islands 
     // within a 33x33 area around the center block
@@ -199,7 +199,7 @@ Pos3 getIslandTallestBlock(Generator* endBiomeGenerator, uint64_t lower48, ref(P
         for (int cz = minChunk.z; cz <= maxChunk.z; cz++) 
         {
             //DEBUG("> CHUNK POS   %d %d\n", cx, cz);
-            EndIslandPair islandInfo = generateIslands(endBiomeGenerator, lower48, cx*16, cz*16);
+            EndIslandPair islandInfo = generateIslands(ctx, cx*16, cz*16);
             addIntersectingIslands(islandArray, &arraySize, &islandInfo, &area, maxSurfaceHeight);
         }
     }
@@ -242,13 +242,13 @@ Pos3 getIslandTallestBlock(Generator* endBiomeGenerator, uint64_t lower48, ref(P
 }
 
 
-bool chunkHasIslandBlocks(ref(Pos) chunkPos, Generator* endBiomeGenerator, uint64_t lower48) 
+bool chunkHasIslandBlocks(ref(EndContext) ctx, ref(Pos) chunkPos) 
 {
     int chunkX = chunkPos->x;
     int chunkZ = chunkPos->z;
 
     // most likely case, check it first
-    EndIslandPair islandPair = generateIslands(endBiomeGenerator, lower48, chunkX * 16, chunkZ * 16);
+    EndIslandPair islandPair = generateIslands(ctx, chunkX * 16, chunkZ * 16);
     if(islandPair.size > 0)
         return true;
 
@@ -260,7 +260,7 @@ bool chunkHasIslandBlocks(ref(Pos) chunkPos, Generator* endBiomeGenerator, uint6
             if (cx == chunkX && cz == chunkZ) 
                 continue;
             
-            islandPair = generateIslands(endBiomeGenerator, lower48, cx * 16, cz * 16);
+            islandPair = generateIslands(ctx, cx * 16, cz * 16);
             if (anyIslandIntersectsChunk(&islandPair, chunkX, chunkZ))
                 return true;
         }
@@ -274,32 +274,34 @@ bool chunkHasIslandBlocks(ref(Pos) chunkPos, Generator* endBiomeGenerator, uint6
 // optimized terrain gen functions
 // ---------------------------------
 
-void initEndTerrainNoise(EndTerrainNoise* const etn, uint64_t lower48) 
+void initEndContext(EndContext* const ctx, uint64_t lower48) 
 {
-    etn->seed = lower48;
+    ctx->seed = lower48;
 
-    initSurfaceNoise(&(etn->surfaceNoise), DIM_END, lower48);
-    setEndSeed(&(etn->endNoise), MC, lower48);
+    setupGenerator(&(ctx->biomeSource), MC, 0);
+    applySeed(&(ctx->biomeSource), DIM_END, lower48);
+    initSurfaceNoise(&(ctx->surfaceNoise), DIM_END, lower48);
+    setEndSeed(&(ctx->endNoise), MC, lower48);
 
     NoiseRegion nreg = {0};
-    etn->noiseRegion = nreg;
+    ctx->noiseRegion = nreg;
 }
 
 
-void sampleColumn(EndTerrainNoise* const etn, int cellX, int cellZ, const int minX, const int minZ)
+void sampleColumn(EndContext* const ctx, int cellX, int cellZ, const int minX, const int minZ)
 {
     const int minCellX = minX >> 3;
     const int minCellZ = minZ >> 3;
 
     sampleNoiseColumnEnd(
-        etn->noiseRegion.noisecolumn[cellX][cellZ], &(etn->surfaceNoise), &(etn->endNoise), // noise structs
+        ctx->noiseRegion.noisecolumn[cellX][cellZ], &(ctx->surfaceNoise), &(ctx->endNoise), // noise structs
         cellX + minCellX, cellZ + minCellZ, // noise column coords
         0, 32 // y0, y1
     );
 }
 
 
-void sampleNoiseColumnsCached(EndTerrainNoise* const etn, bool noiseCalculated[][NOISE_REGION_SIZE], int cellX, int cellZ, const int minX, const int minZ)
+void sampleNoiseColumnsCached(EndContext* const ctx, bool noiseCalculated[][NOISE_REGION_SIZE], int cellX, int cellZ, const int minX, const int minZ)
 {
     // sample all noise columns in area (cellX, cellZ), (cellX+1, cellZ+1) that haven't been sampled before
     for (int cellDX = 0; cellDX <= 1; cellDX++)
@@ -308,7 +310,7 @@ void sampleNoiseColumnsCached(EndTerrainNoise* const etn, bool noiseCalculated[]
         {
             if (!noiseCalculated[cellX + cellDX][cellZ + cellDZ]) 
             {
-                sampleColumn(etn, cellX + cellDX, cellZ + cellDZ, minX, minZ);
+                sampleColumn(ctx, cellX + cellDX, cellZ + cellDZ, minX, minZ);
                 // DEBUG("sampled noise: min block %d %d,  cell: %d %d\n", minX, minZ, cellX + cellDX, cellZ + cellDZ);
                 noiseCalculated[cellX + cellDX][cellZ + cellDZ] = true;
             }
@@ -317,20 +319,20 @@ void sampleNoiseColumnsCached(EndTerrainNoise* const etn, bool noiseCalculated[]
 }
 
 
-int getHeightAt(EndTerrainNoise* const etn, int arrayCellX, int arrayCellZ, int x, int z)
+int getHeightAt(ref(EndContext) ctx, int arrayCellX, int arrayCellZ, int x, int z)
 {
     double dx = (x & 7) / 8.0;
     double dz = (z & 7) / 8.0;
 
     return getSurfaceHeight(
-        etn->noiseRegion.noisecolumn[arrayCellX][arrayCellZ],   etn->noiseRegion.noisecolumn[arrayCellX][arrayCellZ+1],
-        etn->noiseRegion.noisecolumn[arrayCellX+1][arrayCellZ], etn->noiseRegion.noisecolumn[arrayCellX+1][arrayCellZ+1],
+        ctx->noiseRegion.noisecolumn[arrayCellX][arrayCellZ],   ctx->noiseRegion.noisecolumn[arrayCellX][arrayCellZ+1],
+        ctx->noiseRegion.noisecolumn[arrayCellX+1][arrayCellZ], ctx->noiseRegion.noisecolumn[arrayCellX+1][arrayCellZ+1],
         0, 32, 4, dx, dz
     );
 }
 
 
-bool chunkHasTerrainBlocks(ref(Pos) chunkPos, EndTerrainNoise* const etn, bool minHeight30) 
+bool chunkHasTerrainBlocks(EndContext* const ctx, ref(Pos) chunkPos,  bool minHeight30) 
 {
     const int minX = chunkPos->x << 4;
     const int minZ = chunkPos->z << 4;
@@ -347,10 +349,10 @@ bool chunkHasTerrainBlocks(ref(Pos) chunkPos, EndTerrainNoise* const etn, bool m
             const int arrayCellZ = (z >> 3) - (minZ >> 3);
             //DEBUG("$$ CELL %d %d\n", cellX, cellZ);
 
-            sampleNoiseColumnsCached(etn, noiseCalculated, arrayCellX, arrayCellZ, minX, minZ);
+            sampleNoiseColumnsCached(ctx, noiseCalculated, arrayCellX, arrayCellZ, minX, minZ);
 
             // get the surface height using the calculated noise vals
-            int height = getHeightAt(etn, arrayCellX, arrayCellZ, x, z);
+            int height = getHeightAt(ctx, arrayCellX, arrayCellZ, x, z);
             if (height > 0 && (!minHeight30 || height >= 30)) 
                 return true;
         }
@@ -361,7 +363,7 @@ bool chunkHasTerrainBlocks(ref(Pos) chunkPos, EndTerrainNoise* const etn, bool m
 }
 
 
-Pos3 getTerrainTallestBlock(ref(Pos3) center, EndTerrainNoise* const etn) 
+Pos3 getTerrainTallestBlock(EndContext* const ctx, ref(Pos3) center) 
 {
     BlockArea searchArea = {center->x - 16, center->z - 16, center->x + 16, center->z + 16};
     Pos3 terrainMax = NULL_POS;
@@ -370,7 +372,7 @@ Pos3 getTerrainTallestBlock(ref(Pos3) center, EndTerrainNoise* const etn)
     // no need to do cached on-demand sampling cause we're checking all the blocks in the area anyway
     for (int i = 0; i < NOISE_REGION_SIZE; i++)
         for (int j = 0; j < NOISE_REGION_SIZE; j++)
-            sampleColumn(etn, i, j, searchArea.minX, searchArea.minZ);
+            sampleColumn(ctx, i, j, searchArea.minX, searchArea.minZ);
     
     int minCellX = searchArea.minX >> 3;
     int minCellZ = searchArea.minZ >> 3;
@@ -383,7 +385,7 @@ Pos3 getTerrainTallestBlock(ref(Pos3) center, EndTerrainNoise* const etn)
             int arrayCellZ = (z >> 3) - minCellZ;
 
             // get the surface height using the calculated noise vals
-            int height = getHeightAt(etn, arrayCellX, arrayCellZ, x, z);
+            int height = getHeightAt(ctx, arrayCellX, arrayCellZ, x, z);
             if (height > terrainMax.y) 
                 setPos(&terrainMax, x, height, z);
         }
@@ -412,9 +414,9 @@ Pos getMainGateway(uint64_t lower48) {
     return gateways[ix];
 }
 
-Pos3 linkedGateway(uint64_t lower48)
+Pos3 linkedGateway(EndContext* const ctx)
 {
-	Pos mainGateway = getMainGateway(lower48);
+	Pos mainGateway = getMainGateway(ctx->seed);
     DEBUG("MAIN GATEWAY   %d %d\n", mainGateway.x, mainGateway.z);
 
     double rootlen = sqrt(mainGateway.x * mainGateway.x + mainGateway.z * mainGateway.z);
@@ -426,21 +428,12 @@ Pos3 linkedGateway(uint64_t lower48)
     Vec incrementVector = {normalizedVector.x * 16.0, normalizedVector.z * 16.0};
     DEBUG("GATEWAY VEC   %lf %lf\n", gatewayVector.x, gatewayVector.z);
 
-    // biome source
-    Generator endBiomeGenerator;
-    setupGenerator(&endBiomeGenerator, MC, 0);
-    applySeed(&endBiomeGenerator, 1, lower48);
-
-    // terrain source
-    EndTerrainNoise etn;
-    initEndTerrainNoise(&etn, lower48);
-
     // skip non-empty chunks
     for (int n = 0; n < 16; n++) //Checking towards the main end island to see if there are blocks (in case the original vector plopped me in the middle of a huge island)
     {
         Pos chunkPos = {floor(gatewayVector.x / 16), floor(gatewayVector.z / 16)};
 
-        if (!chunkHasIslandBlocks(&chunkPos, &endBiomeGenerator, lower48) && !chunkHasTerrainBlocks(&chunkPos, &etn, false)) 
+        if (!chunkHasIslandBlocks(ctx, &chunkPos) && !chunkHasTerrainBlocks(ctx, &chunkPos, false)) 
             break;
         
         DEBUG("SKIP non-empty %lf %lf\n", gatewayVector.x, gatewayVector.z);
@@ -453,9 +446,7 @@ Pos3 linkedGateway(uint64_t lower48)
     {
         Pos chunkPos = {floor(gatewayVector.x / 16), floor(gatewayVector.z / 16)};
 
-        if (chunkHasIslandBlocks(&chunkPos, &endBiomeGenerator, lower48)) 
-            break;
-        if (chunkHasTerrainBlocks(&chunkPos, &etn, false)) 
+        if (chunkHasIslandBlocks(ctx, &chunkPos) || chunkHasTerrainBlocks(ctx, &chunkPos, false)) 
             break;
         
         DEBUG("SKIP empty %lf %lf\n", gatewayVector.x, gatewayVector.z);
@@ -465,8 +456,8 @@ Pos3 linkedGateway(uint64_t lower48)
 
     // findValidSpawnInChunk substitute
     Pos chunkPos = {floor(gatewayVector.x / 16), floor(gatewayVector.z / 16)};
-    bool chunkHasValidSpawn = chunkHasIslandBlocks(&chunkPos, &endBiomeGenerator, lower48) 
-        || chunkHasTerrainBlocks(&chunkPos, &etn, true);
+    bool chunkHasValidSpawn = chunkHasIslandBlocks(ctx, &chunkPos) 
+        || chunkHasTerrainBlocks(ctx, &chunkPos, true);
     
     if (!chunkHasValidSpawn) 
     {
@@ -492,10 +483,10 @@ Pos3 linkedGateway(uint64_t lower48)
     Pos3 center = {cx*16 + 15, 0, cz*16 + 15};
 
     // calculate maximum surface height around center
-    Pos3 surfaceMax = getTerrainTallestBlock(&center, &etn); // This takes ~50% of the runtime (this was written when runtime was ~11 secs)
+    Pos3 surfaceMax = getTerrainTallestBlock(ctx, &center); // This takes ~50% of the runtime (this was written when runtime was ~11 secs)
 
     // calculate maximum small end island height around center
-    Pos3 islandMax = getIslandTallestBlock(&endBiomeGenerator, lower48, &center, surfaceMax.y);
+    Pos3 islandMax = getIslandTallestBlock(ctx, &center, surfaceMax.y);
     DEBUG("ISLAND MAX  %d %d %d\n", islandMax.x, islandMax.y, islandMax.z);
 
     // compare the two max positions and choose the one that has higher priority
@@ -521,12 +512,12 @@ Pos3 linkedGateway(uint64_t lower48)
     return gateway;
 }
 
-bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
+bool findEndCities(EndContext* const ctx, Pos* endCityCoords, Pos3* gatewayCoords)
 {
-    *gatewayCoords = linkedGateway(lower48); // Can optimize further - main cause of slowdown
+    *gatewayCoords = linkedGateway(ctx); // Can optimize further - main cause of slowdown
     Pos endCityRegionCoords = {floor(gatewayCoords->x / (double)(16 * 20)), floor(gatewayCoords->z / (double)(16 * 20))};
 
-    if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, endCityCoords)) // See if theres a generation attempt within the region
+    if (!getStructurePos(End_City, MC_1_16_1, ctx->seed, endCityRegionCoords.x, endCityRegionCoords.z, endCityCoords)) // See if theres a generation attempt within the region
         return false;
     
     int dX = abs(gatewayCoords->x - endCityCoords->x); // See if the end city is within 96 chebyshev distance from the gateway
@@ -534,16 +525,10 @@ bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
     if (dX > 96 || dZ > 96)
         return false;
 
-    Generator endBiomeSource;
-    setupGenerator(&endBiomeSource, MC_1_16_1, 0);
-    SurfaceNoise endSurfaceNoise;
-    initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
-    applySeed(&endBiomeSource, DIM_END, lower48);
-
-    if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords->x, endCityCoords->z, 0)) // Checking if it can generate due to biomes
+    if (!isViableStructurePos(End_City, &(ctx->biomeSource), endCityCoords->x, endCityCoords->z, 0)) // Checking if it can generate due to biomes
         return false;
 
-    if (!isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, endCityCoords->x, endCityCoords->z))// Checking if it can generate (if y >= 60)
+    if (!isViableEndCityTerrain(&(ctx->biomeSource), &(ctx->surfaceNoise), endCityCoords->x, endCityCoords->z))// Checking if it can generate (if y >= 60)
         return false;
     else return true;
 }
@@ -561,14 +546,8 @@ bool checkForShip(uint64_t lower48, Pos endCityCoords)
 
 // WIP
 
-bool isEndCityNearby(uint64_t lower48)
-{    
-    Generator endBiomeSource;
-    setupGenerator(&endBiomeSource, MC_1_16_1, 0);
-    SurfaceNoise endSurfaceNoise;
-    initSurfaceNoise(&endSurfaceNoise, DIM_END, lower48); 
-    applySeed(&endBiomeSource, DIM_END, lower48);
-
+bool isEndCityNearby(EndContext* const ctx)
+{
     // array of regions that need to be checked for each main gateway position (index)
     // dynamic allocation would save some memory, but since it's just 160 ints it shouldn't be an issue
     static Pos regions[20][5] = 
@@ -596,7 +575,7 @@ bool isEndCityNearby(uint64_t lower48)
     };
 
     uint64_t rng = 0;
-	setSeed(&rng, lower48);
+	setSeed(&rng, ctx->seed);
 	int ix = nextInt(&rng, 20);
     Pos* regionList = regions[ix];
 
@@ -605,11 +584,11 @@ bool isEndCityNearby(uint64_t lower48)
     {
         Pos cityCoords = {0, 0};
 
-        if (getStructurePos(End_City, MC_1_16_1, lower48, regionList[i].x, regionList[i].z, &cityCoords))
+        if (getStructurePos(End_City, MC_1_16_1, ctx->seed, regionList[i].x, regionList[i].z, &cityCoords))
         {
-            if (isViableStructurePos(End_City, &endBiomeSource, cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
+            if (isViableStructurePos(End_City, &(ctx->biomeSource), cityCoords.x, cityCoords.z, 0)) // Checking if it can generate due to biomes
             {
-                if (isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
+                if (isViableEndCityTerrain(&(ctx->biomeSource), &(ctx->surfaceNoise), cityCoords.x, cityCoords.z)) // Checking if it can generate (if y >= 60)
                     return true; // This seed has an end city. If the loops didn't finish, this seed didn't have an end city and returns false (hence final return statement being false)
             }
         }
