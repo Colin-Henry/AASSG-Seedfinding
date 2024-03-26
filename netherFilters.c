@@ -49,9 +49,9 @@ bool checkStructureReqs(const Generator* biomeSource, Pos* bast, Pos* fort)
 {
     if (!checkStructureDistances(bast, fort))
         return false;
-        
-    //else
-    //applySeed((Generator *)biomeSource, DIM_NETHER, currentStructureSeed);
+    else
+
+    applySeed((Generator *)biomeSource, DIM_NETHER, currentStructureSeed);
 
     if ((getBiomeAt(biomeSource, 4, (bast->x >> 2) + 2, 0, (bast->z >> 2) + 2)) == basalt_deltas)
         return false; // check if bastion spawns
@@ -73,11 +73,6 @@ bool findFastions(uint64_t currentStructureSeed, Pos* bastions, int bastCount, P
     getNetherStructs(currentStructureSeed, bastions, &bastCount, forts, &fortCount);
     if (bastCount == 0 || fortCount == 0) // skip seeds that don't have a bastion or don't have a fort
         return false;
-    
-    // optimization:
-    // initialize nether biome source after checking the fast structure requirements
-    setupGenerator(biomeSource, MC_1_16_1, 0);
-    applySeed(biomeSource, DIM_NETHER, currentStructureSeed);
 
     // check the requirements for each bastion-fortress pair
     for (bastID = 0; bastID < bastCount; bastID++)

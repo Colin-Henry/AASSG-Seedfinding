@@ -46,31 +46,28 @@ int main(int argc, char *argv[])
         int fortID = 0;
         Pos3 gatewayCoords = {0, 0, 0};
         Pos endCityCoords = {0, 0};
+
+        Generator biomeSource;
+        setupGenerator(&biomeSource, MC_1_16_1, 0);
     
         threadFileOpener(&threadFileManagement, rank);
 
         for (currentStructureSeed = startIteration; currentStructureSeed <= endIteration; currentStructureSeed++) 
         {
-            // the initialization of netherBiomeSource is handled within findFastions()
-            Generator netherBiomeSource;
-            bool isFastion = findFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &netherBiomeSource, bastID, fortID);
+            bool isFastion = findFastions(currentStructureSeed, bastions, bastCount, forts, fortCount, &biomeSource, bastID, fortID);
 
             if (isFastion)
             {
                 fprintf(threadFileManagement.fastionSeeds, "%" PRId64 "\n", currentStructureSeed);
 
-                bool isSSV = checkForSSV(&forts[fortID], &netherBiomeSource);
+                bool isSSV = checkForSSV(&forts[fortID], &biomeSource);
                 if (isSSV)
                     fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                // initialize the end biome & terrain generators
-                EndContext ctx;
-                initEndContext(&ctx, currentStructureSeed);
-
-                if (!isEndCityNearby(&ctx))
+                if (!isEndCityNearby(currentStructureSeed))
                     continue;
                 
-                bool isEndCity = findEndCities(&ctx, &endCityCoords, &gatewayCoords);
+                bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords);
                 if (isEndCity)
                 {
                     fprintf(threadFileManagement.fastionEndCitySeeds, "%" PRId64 "\n", currentStructureSeed);
