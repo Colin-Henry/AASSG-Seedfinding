@@ -107,205 +107,205 @@ void threadFileOpener(struct threadFileManagement *threadFileManagement, int ran
 void mainFileWriterAndDeleter(int size)
 {
     for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastions
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionSeeds/fastionSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionSeeds/fastionSeeds_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            // Copying over everything from the temp file to the main file
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionSeeds);
+        // Copying over everything from the temp file to the main file
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.fastionSeeds);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastions
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionSeeds/ssvFastionSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastions
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionSeeds/ssvFastionSeeds_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionSeeds);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionSeeds);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeeds/fastionEndCitySeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeeds/fastionEndCitySeeds_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeeds);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeeds);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities with coords
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeedsWithCoords/fastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end cities with coords
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCitySeedsWithCoords/fastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeedsWithCoords);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCitySeedsWithCoords);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeeds/ssvFastionEndCitySeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeeds/ssvFastionEndCitySeeds_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeeds);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeeds);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities with coords
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeedsWithCoords/ssvFastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end cities with coords
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCitySeedsWithCoords/ssvFastionEndCitySeedsWithCoords_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeedsWithCoords);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCitySeedsWithCoords);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeeds/fastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeeds/fastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeeds);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeeds);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships with coords
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeedsWithCoords/fastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for fastion end city ships with coords
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/fastionEndCityShipSeedsWithCoords/fastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeedsWithCoords);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.fastionEndCityShipSeedsWithCoords);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeeds/ssvFastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeeds/ssvFastionEndCityShipSeeds_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeeds);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeeds);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 
-        for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships with coords
-        {
-            char tempFile[256];
-            snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeedsWithCoords/ssvFastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
-        
-            FILE *tempInputFile = fopen(tempFile, "r");
-            if (tempInputFile == NULL) 
-                perror("Error opening input file");
+    for (int currentTempFile = 1; currentTempFile <= (size - 1); currentTempFile++) // for ssv fastion end city ships with coords
+    {
+        char tempFile[256];
+        snprintf(tempFile, sizeof(tempFile), "Output/Temp/ssvFastionEndCityShipSeedsWithCoords/ssvFastionEndCityShipSeedsWithCoords_temp_%d.txt", currentTempFile);
+    
+        FILE *tempInputFile = fopen(tempFile, "r");
+        if (tempInputFile == NULL) 
+            perror("Error opening input file");
 
-            char buffer[1024];
-            size_t bytesRead;
-            while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
-                fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeedsWithCoords);
+        char buffer[1024];
+        size_t bytesRead;
+        while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempInputFile)) > 0) 
+            fwrite(buffer, 1, bytesRead, fileManagement.ssvFastionEndCityShipSeedsWithCoords);
 
-            fclose(tempInputFile);
+        fclose(tempInputFile);
 
-            if (remove(tempFile) != 0) 
-                perror("Error deleting temporary file");
-        }
+        if (remove(tempFile) != 0) 
+            perror("Error deleting temporary file");
+    }
 }
 
 void threadFileCloser(struct threadFileManagement *threadFileManagement)
