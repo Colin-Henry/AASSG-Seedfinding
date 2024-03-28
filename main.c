@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
                 if (isSSV)
                     fprintf(threadFileManagement.ssvFastionSeeds, "%" PRId64 "\n", currentStructureSeed);
                 
-                if (!isEndCityNearby(currentStructureSeed))
-                    continue;
+                //if (!isEndCityNearby(currentStructureSeed))
+                    //continue;
                 
                 bool isEndCity = findEndCities(currentStructureSeed, &endCityCoords, &gatewayCoords);
                 if (isEndCity)

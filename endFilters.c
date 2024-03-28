@@ -1,6 +1,6 @@
 #include "endFilters.h"
 
-#define DEBUGGING_ENABLED false
+#define DEBUGGING_ENABLED true
 #define DEBUG if(DEBUGGING_ENABLED)printf
 
 // ----------
@@ -524,16 +524,20 @@ Pos3 linkedGateway(uint64_t lower48)
 bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
 {
     *gatewayCoords = linkedGateway(lower48); // Can optimize further - main cause of slowdown
+    DEBUG("gateway coords: %d %d\n", gatewayCoords->x, gatewayCoords->z);
     Pos endCityRegionCoords = {floor(gatewayCoords->x / (double)(16 * 20)), floor(gatewayCoords->z / (double)(16 * 20))};
-
+    DEBUG("region coords: %d %d\n", endCityRegionCoords.x, endCityRegionCoords.x);
     if (!getStructurePos(End_City, MC_1_16_1, lower48, endCityRegionCoords.x, endCityRegionCoords.z, endCityCoords)) // See if theres a generation attempt within the region
         return false;
-    
+    DEBUG("after !getStructurePos\n");
     int dX = abs(gatewayCoords->x - endCityCoords->x); // See if the end city is within 96 chebyshev distance from the gateway
     int dZ = abs(gatewayCoords->z - endCityCoords->z);
+    DEBUG("gateway coords: %d %d\n", gatewayCoords->x, gatewayCoords->z);
+    DEBUG("end city coords: %d %d\n", endCityCoords->x, endCityCoords->z);
+    DEBUG("dX %d dZ %d\n", dX, dZ);
     if (dX > 96 || dZ > 96)
         return false;
-
+    DEBUG("after distance check\n");
     Generator endBiomeSource;
     setupGenerator(&endBiomeSource, MC_1_16_1, 0);
     SurfaceNoise endSurfaceNoise;
@@ -542,7 +546,8 @@ bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
 
     if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords->x, endCityCoords->z, 0)) // Checking if it can generate due to biomes
         return false;
-
+    DEBUG("after !isViableStructurePos\n");
+    DEBUG("Return statement: %d\n", isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, endCityCoords->x, endCityCoords->z));
     if (!isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, endCityCoords->x, endCityCoords->z))// Checking if it can generate (if y >= 60)
         return false;
     else return true;
