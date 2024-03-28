@@ -103,15 +103,13 @@ int main(int argc, char *argv[])
 
     if (rank == 0) // Writing everything to the main file and deleting the temp files as it goes
         mainFileWriterAndDeleter(size);
-    
-    MPI_Barrier(MPI_COMM_WORLD);
   
     double endTime = MPI_Wtime();
 
     MPI_Reduce(&endTime, &totalTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     if (rank == 0) 
-    {
+    {        
         printf("Total execution time (s): %lf\n", totalTime - startTime);
         printf("Done\n");
     }
