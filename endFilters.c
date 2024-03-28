@@ -536,14 +536,17 @@ bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
             int dX = abs(gatewayCoords->x - endCityCoords->x); // See if the end city is within 96 chebyshev distance from the gateway
             int dZ = abs(gatewayCoords->z - endCityCoords->z);
             if (dX <= 96 && dZ <= 96)
-            {
-                foundCityInProx = true;
-                break;
-            }
+                {
+                    foundCityInProx = true;
+                    break;
+                }
         }
         if (foundCityInProx)
             break;
     }
+
+    if (!foundCityInProx)
+        return false;
 
     Generator endBiomeSource;
     setupGenerator(&endBiomeSource, MC_1_16_1, 0);
@@ -553,7 +556,6 @@ bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords)
 
     if (!isViableStructurePos(End_City, &endBiomeSource, endCityCoords->x, endCityCoords->z, 0)) // Checking if it can generate due to biomes
         return false;
-
     if (!isViableEndCityTerrain(&endBiomeSource, &endSurfaceNoise, endCityCoords->x, endCityCoords->z))// Checking if it can generate (if y >= 60)
         return false;
     else return true;
