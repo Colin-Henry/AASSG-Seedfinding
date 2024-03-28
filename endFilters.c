@@ -563,13 +563,10 @@ bool checkForShip(uint64_t lower48, Pos* endCityCoords)
 {
     Piece endCityPieces[END_CITY_PIECES_MAX];
     int numberOfPieces = getEndCityPieces((Piece *)endCityPieces, lower48, (endCityCoords->x >> 4), (endCityCoords->z >> 4));
-    for (int currentPiece = 0; currentPiece <= numberOfPieces; currentPiece++)
+    for (int currentPiece = 0; currentPiece < numberOfPieces; currentPiece++)
     {
-        //printf("current piece: %d\n", endCityPieces[currentPiece].type);
         if (endCityPieces[currentPiece].type == END_SHIP)
             return true;
-        //printf("no more pieces\n");
-        //printf("seed %ld\n", lower48);
     }
     return false;
 }
