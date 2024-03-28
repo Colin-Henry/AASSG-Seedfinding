@@ -102,7 +102,12 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
 
     if (rank == 0) // Writing everything to the main file and deleting the temp files as it goes
+    {
         mainFileWriterAndDeleter(size);
+        fileCloser(&fileManagement);
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
   
     double endTime = MPI_Wtime();
 
@@ -114,7 +119,6 @@ int main(int argc, char *argv[])
         printf("Done\n");
     }
 
-    fileCloser(&fileManagement);
     MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Finalize();
