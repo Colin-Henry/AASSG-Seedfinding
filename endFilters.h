@@ -119,4 +119,4 @@ int getSurfaceHeight(const double ncol00[], const double ncol01[], const double 
 
 bool isEndCityNearby(uint64_t lower48);
 bool findEndCities(uint64_t lower48, Pos* endCityCoords, Pos3* gatewayCoords);
-bool checkForShip(uint64_t lower48, Pos endCityCoords);
+bool checkForShip(uint64_t lower48, Pos* endCityCoords);
