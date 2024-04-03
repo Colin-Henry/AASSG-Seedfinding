@@ -43,8 +43,10 @@ uint64_t startingStructureSeed, endingStructureSeed, currentStructureSeed;
 
 void fileOpener(struct fileManagement *fileManagement);
 void fileCloser(struct fileManagement *fileManagement);
+void fileWriteCloserReadOpener(struct fileManagement *fileManagement);
 void readSeedRange(struct fileManagement *fileManagement, uint64_t *startingStructureSeed, uint64_t *endingStructureSeed);
 
 void threadFileOpener(struct threadFileManagement *threadFileManagement, int rank);
 void mainFileWriterAndDeleter(int size);
 void threadFileCloser(struct threadFileManagement *threadFileManagement);
+void fileEntryCounter(struct fileManagement *fileManagement, double totalTime, double startTime);

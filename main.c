@@ -100,47 +100,21 @@ int main(int argc, char *argv[])
     
 
     MPI_Barrier(MPI_COMM_WORLD); // Ensure all processes have completed before closing files
-
-    if (rank == 0) // Writing everything to the main file and deleting the temp files as it goes
-    {
-        mainFileWriterAndDeleter(size);
-        fileCloser(&fileManagement);
-    }
-
-    MPI_Barrier(MPI_COMM_WORLD);
-  
     double endTime = MPI_Wtime();
-
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Reduce(&endTime, &totalTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
     if (rank == 0) 
-    {        
-        printf("Total execution time (s): %lf\n", totalTime - startTime);
-        printf("Done\n");
+    {
+        mainFileWriterAndDeleter(size);// Writing everything to the main file and deleting the temp files as it goes
+        fileWriteCloserReadOpener(&fileManagement);
+        fileEntryCounter(&fileManagement, totalTime, startTime); // Gathering data on the seedcounts of the project
+        fileCloser(&fileManagement); // Closing all files
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-
     MPI_Finalize();
     
     return 0;
 }
-
-// All seed amounts are just fastion seeds, all times are single-threaded
-// 2^16 = 65536 (.005 s) (CBViewer has 62 results)
-// 2^20 = 1048576 (.068 s) (CBViewer has 760 results)
-// 2^24 = 16777216 (1.088 s) (CBViewer has 12,118 results)
-// 2^32 = 4294967296 (280.162 s) (CBViewer has 3,127,350 results)
-// Est. 2^48 time: 19.92 hr (Based on 2^32 time, 256 threads)
-// Est. structure seeds: 204,954,009,600 seeds (Based on 2^32 seedcount)
-// Est. 64-bit seeds: 13,431,866,000,000,000 seeds (Based on 2^32 seedcount)
-
-// For SSV Fastion End City Ship Seeds
-// Est. structure seeds: 721,420,289 seeds (Based on 43 results for 16777216 seeds)
-// Est. time: 722.909992 hr (Based on cluster using 512 cores)
-
-// Fastion results match cubiomesViewer (tested from 0-2^32)
-
-// TODO:
-// Add a seed counter for all types and print data to console
-// Update github accordingly
